@@ -203,7 +203,9 @@ INSERT INTO FriendAccapte VALUES (1,3),
 	(2,4),
 	(1,5),
 	(2,6),
-	(5,4)
+	(5,4),
+	(1,2),
+	(3,4)
 
 --DISPLAY FRIEND
 SELECT U.Uid,U.Name FROM FriendAccapte FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
