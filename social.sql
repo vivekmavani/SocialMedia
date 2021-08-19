@@ -50,7 +50,49 @@ Msg varchar(max) not null,
 msg_time datetime DEFAULT GETDATE()
 )
 
+USE [socialmedia]
+GO
 
+INSERT INTO [dbo].[Categories]
+           ([Category_Name])
+     VALUES
+           ('Album'),
+		   ('Amateur Sports Team'),
+		   ('Art'),
+		   ('Financial Service'),
+		   ('Book'),
+		   ('Doctor'),
+		   ('Education'),
+		   ('Gaming'),
+		   ('Hotel'),
+		   ('Home Decor'),
+		   ('Home Improvement'),
+		   ('Internet Company'),
+		   ('Kitchen'),
+		   ('Library'),
+		   ('Movie'),
+		   ('Newspaper'),
+		    ('Restaurant'),
+		   ('School'),
+		   ('Song'),
+		    ('Traffic School'),
+		   ('Visual Arts'),
+		   ('Website'),
+		   ('Zoo')
+GO
+SELECT Category_Name 'Categories' FROM Categories ORDER BY Category_Name
+
+UPDATE [dbo].[Categories]
+   SET [Category_Name] = 'Albums'
+ WHERE Category_ID = 26
+GO
+
+USE [socialmedia]
+GO
+
+DELETE FROM [dbo].[Categories]
+      WHERE Category_ID = 27
+GO
 
 --Select convert(varchar(100),DecryptByPassPhrase('key',@Encrypt )) as Decrypt  
 --Declare @Encrypt varbinary(200)  
