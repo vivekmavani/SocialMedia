@@ -158,6 +158,61 @@ WHERE msg_time = '2021-08-19 13:29:22.713'
 -- DELETE FROM Chat WHERE msg_time = '2021-08-19 13:29:22.713'
 -- DELETE FROM Chat WHERE Sender = 1 AND Receiver = 2
 
+USE socialmedia
+GO
+
+--DISPLAY ALL POST
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Users U ON P.Uid = U.Uid 
+WHERE U.Visible = 1
+
+--DISPLAY ALL POST FOR ONLY FRIEND
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccapte FA ON P.Uid = FA.Uid
+
+--DISPLAY POST BUT CATAGORIES VISE
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Categories C ON 
+P.Category_ID = C.Category_ID where C.Category_Name = 'Art'
+
+--ADD POST BY FRIEND
+INSERT INTO Post VALUES ('photos','check this post','img_10',20,1,1),
+	('like photo','check this post','img_101',10,2,3),
+	('educational','post','img_101',20,7,4),
+	('pubg','player','img_20',31,8,6),
+	('dr.','operation','img_31',2,6,5),
+	('new place','check out this post','img_100',30,1,4),
+	('sport','fun news','img_110',24,2,5),
+	('bajaj','loan work','img_50',2,4,5),
+	('decoration','fastival decor','img_21',30,10,8)
+
+--UPDATE POST BUT FRIEND
+UPDATE [dbo].[Post]
+   SET [Title] = <Title, varchar(20),>
+      ,[Description] = <Description, varchar(100),>
+      ,[Image] = <Image, varchar(100),>
+      ,[Likes] = <Likes, int,>
+      ,[Category_ID] = <Category_ID, int,>
+      ,[Uid] = <Uid, int,>
+
+--DELETE POST 
+
+DELETE FROM [dbo].[Post]
+
+
+--FRIEND ACCAPTE TABLE DATA
+INSERT INTO FriendAccapte VALUES (1,3),
+	(2,3),
+	(2,4),
+	(1,5),
+	(2,6),
+	(5,4)
+
+--DISPLAY FRIEND
+SELECT U.Uid,U.Name FROM FriendAccapte FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
+
+--UN FRIEND
+DELETE FROM [dbo].[FriendAccapte]
+
+
+
 
 
 --Select convert(varchar(100),DecryptByPassPhrase('key',@Encrypt )) as Decrypt  
