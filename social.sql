@@ -100,7 +100,10 @@ GO
 INSERT INTO Users(Name,City,Email,PhoneNumber,Password)
 VALUES
 ('Hiren','Jamnagar','hiren@gmail.com',5687412894,'hiren123');
-
+-- Encrypt
+INSERT INTO Users(Name,City,Email,PhoneNumber,Password)
+VALUES
+('Hiren','Jamnagar','hiren@gmail.com',5687412894,EncryptByPassPhrase('key', 'romish123' ));
 INSERT INTO Users(Name,City,Email,PhoneNumber,Visible,Password)
 VALUES
 ('Romish','Rajkot','romish@gmail.com',2545874962,0,'romish123'),
@@ -119,7 +122,8 @@ where Uid IN (6,7)
 
 
 select * from Users
-
+--Decrypt
+Select Name,City,Email,PhoneNumber,convert(varchar(100),DecryptByPassPhrase('key',Password )) as Password from Users
 -- Queries for Chat database
 
 INSERT INTO Chat VALUES
