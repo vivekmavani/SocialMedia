@@ -173,6 +173,11 @@ SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccapt
 SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Categories C ON 
 P.Category_ID = C.Category_ID where C.Category_Name = 'Art'
 
+--UPDATE POST LIKE
+DECLARE @POSTID INT
+SET @POSTID = 1
+UPDATE Post SET Likes = Likes + 1 WHERE Pid = @POSTID
+
 --ADD POST BY FRIEND
 INSERT INTO Post VALUES ('photos','check this post','img_10',20,1,1),
 	('like photo','check this post','img_101',10,2,3),
@@ -210,7 +215,9 @@ INSERT INTO FriendAccapte VALUES (1,3),
 SELECT U.Uid,U.Name FROM FriendAccapte FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
 
 --UN FRIEND
-DELETE FROM [dbo].[FriendAccapte]
+DECLARE @UNFriendAccid INT
+SET @UNFriendAccid = 1
+DELETE FROM [dbo].[FriendAccapte] WHERE FriendAccapteid = @UNFriendAccid 
 
 
 
