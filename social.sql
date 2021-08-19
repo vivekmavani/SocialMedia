@@ -94,6 +94,29 @@ DELETE FROM [dbo].[Categories]
       WHERE Category_ID = 27
 GO
 
+INSERT INTO Users(Name,City,Email,PhoneNumber,Password)
+VALUES
+('Hiren','Jamnagar','hiren@gmail.com',5687412894,'hiren123');
+
+INSERT INTO Users(Name,City,Email,PhoneNumber,Visible,Password)
+VALUES
+('Romish','Rajkot','romish@gmail.com',2545874962,0,'romish123'),
+('Prit','Navasari','prit@gmail.com',7458963215,1,'prit123'),
+('Vivek','Bhavnagar','Vivek@gmail.com',1205874965,1,'vivek123'),
+('Neel','Gandhinagar','nell@gmail.com',9657432018,0,'neel135'),
+('Jay','Rajkot','jay@gmail.com',7452013601,0,'jay456'),
+('Pratik','Surat','pratik@gmail.com',9658002341,0,'pratik123'),
+('Karan','Morbi','karan@gmail.com',1234567890,0,'karan147'),
+('Veer','Jamnagar','veer@gmail.com',1518960214,0,'veer123'),
+('Meet','Surat','meet@gmail.com',7850123604,0,'meet745');
+
+update Users
+set Visible = 1 
+where Uid IN (6,7)
+
+
+select * from Users
+
 --Select convert(varchar(100),DecryptByPassPhrase('key',@Encrypt )) as Decrypt  
 --Declare @Encrypt varbinary(200)  
 --Select @Encrypt = EncryptByPassPhrase('key', 'Jothish' )  
