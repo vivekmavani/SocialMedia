@@ -1,3 +1,4 @@
+-- create database
 CREATE DATABASE socialmedia
 USE socialmedia
 CREATE TABLE Users
@@ -52,7 +53,7 @@ msg_time datetime DEFAULT GETDATE()
 
 USE [socialmedia]
 GO
-
+-- Categories Add,Update,Delete,Display
 INSERT INTO [dbo].[Categories]
            ([Category_Name])
      VALUES
@@ -116,10 +117,6 @@ where Uid IN (6,7)
 
 
 select * from Users
-
-
-
-
 
 -- Queries for Chat database
 
