@@ -117,6 +117,50 @@ where Uid IN (6,7)
 
 select * from Users
 
+
+
+
+
+-- Queries for Chat database
+
+INSERT INTO Chat VALUES
+(1,2,'hello','2021-08-19 13:25:52.813'),
+(2,1,'hi','2021-08-19 13:26:25.813'),
+(2,1,'how are you','2021-08-19 13:26:52.836'),
+(1,2,'I am fine','2021-08-19 13:26:53.713'),
+(3,4,'HI','2021-08-19 13:27:50.813'),
+(3,4,'I am COmputer Engineer','2021-08-19 13:27:55.813'),
+(4,3,'Same here','2021-08-19 13:28:32.813'),
+(3,4,'I am learning SQL','2021-08-19 13:28:52.813'),
+(4,3,'I am learning HTML','2021-08-19 13:29:22.713')
+
+
+
+DECLARE @Sender int
+SET @Sender = 3
+
+DECLARE @Receiver int
+SET @Receiver = 4
+
+SELECT 
+	(SELECT u.Name FROM Users u WHERE u.Uid = c.Sender) as 'Sender', 
+	(SELECT u.Name FROM Users u WHERE u.Uid = c.Receiver) as 'Receiver', 
+	c.Msg
+FROM Chat c
+WHERE (Sender = @Sender AND Receiver = @Receiver) OR (Sender = @Receiver AND Receiver = @Sender)
+ORDER BY msg_time
+
+
+UPDATE Chat
+SET Msg = 'I am creating database of Social media'
+WHERE msg_time = '2021-08-19 13:29:22.713'
+
+
+-- DELETE FROM Chat WHERE msg_time = '2021-08-19 13:29:22.713'
+-- DELETE FROM Chat WHERE Sender = 1 AND Receiver = 2
+
+
+
 --Select convert(varchar(100),DecryptByPassPhrase('key',@Encrypt )) as Decrypt  
 --Declare @Encrypt varbinary(200)  
 --Select @Encrypt = EncryptByPassPhrase('key', 'Jothish' )  
