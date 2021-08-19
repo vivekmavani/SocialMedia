@@ -1,3 +1,4 @@
+-- create database
 CREATE DATABASE socialmedia
 USE socialmedia
 CREATE TABLE Users
@@ -5,7 +6,7 @@ CREATE TABLE Users
 Uid int  CONSTRAINT uid_User PRIMARY KEY  IDENTITY(1,1),
 Name varchar(20) not null,
 City varchar(20) not null,
-Email varchar(30) not null,
+Email varchar(30) not null CONSTRAINT Email_validation CHECK(Email LIKE'%_@__%.__%')
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 Created_date DATE  DEFAULT GETDATE(),
 Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
@@ -33,6 +34,7 @@ CREATE TABLE FriendRequest
 FriendRequestid int  CONSTRAINT FriendRequestid_Post PRIMARY KEY  IDENTITY(1,1),
 Uid_s int  CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
 Frid_r int CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
+CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r)
 )
 
 CREATE TABLE FriendAccapte
@@ -40,6 +42,7 @@ CREATE TABLE FriendAccapte
 FriendAccapteid int   CONSTRAINT FriendAccapteid_FriendAccapte PRIMARY KEY  IDENTITY(1,1),
 Uid int  CONSTRAINT Uid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid) ,
 Frid int  CONSTRAINT Frid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid),
+CONSTRAINT unique_FriendAccapte UNIQUE(Uid_s,Frid_r)
 )
 CREATE TABLE Chat
 (
@@ -52,7 +55,7 @@ msg_time datetime DEFAULT GETDATE()
 
 USE [socialmedia]
 GO
-
+-- Categories Add,Update,Delete,Display
 INSERT INTO [dbo].[Categories]
            ([Category_Name])
      VALUES
@@ -117,10 +120,6 @@ where Uid IN (6,7)
 
 select * from Users
 
-
-
-
-
 -- Queries for Chat database
 
 INSERT INTO Chat VALUES
@@ -135,9 +134,15 @@ INSERT INTO Chat VALUES
 (4,3,'I am learning HTML','2021-08-19 13:29:22.713')
 
 
+INSERT INTO Chat VALUES
+((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
+
+INSERT INTO Chat VALUES
+((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
+((SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
 
 DECLARE @Sender int
-SET @Sender = 3
+SET @Sender = 2
 
 DECLARE @Receiver int
 SET @Receiver = 4
@@ -209,7 +214,9 @@ INSERT INTO FriendAccapte VALUES (1,3),
 	(2,4),
 	(1,5),
 	(2,6),
-	(5,4)
+	(5,4),
+	(1,2),
+	(3,4)
 
 --DISPLAY FRIEND
 SELECT U.Uid,U.Name FROM FriendAccapte FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
@@ -219,7 +226,30 @@ DECLARE @UNFriendAccid INT
 SET @UNFriendAccid = 1
 DELETE FROM [dbo].[FriendAccapte] WHERE FriendAccapteid = @UNFriendAccid 
 
+-- send friend request 
+INSERT INTO FriendRequest VALUES (1,3),
+	(2,3),
+	(2,4),
+	(1,5),
+	(2,6),
+	(5,4),
+	(1,2),
+	(3,4)
 
+GO
+SELECT * FROM [FriendRequest]
+-- dispaly friend request by id
+SELECT a.Name,a.Uid FROM Users a JOIN FriendRequest b ON a.Uid = b.Frid_r WHERE b.Uid_s = 1  
+-- delete request 
+DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
+--  acceapte request
+
+
+INSERT INTO FriendAccapte VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
+                                  (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
+DELETE FROM FriendRequest WHERE FriendRequestid = 6
+SELECT * FROM FriendAccapte 
+SELECT * FROM FriendRequest
 
 
 
@@ -227,3 +257,6 @@ DELETE FROM [dbo].[FriendAccapte] WHERE FriendAccapteid = @UNFriendAccid
 --Declare @Encrypt varbinary(200)  
 --Select @Encrypt = EncryptByPassPhrase('key', 'Jothish' )  
 --Select @Encrypt as Encrypt 
+
+
+SELECT * FROM Chat
