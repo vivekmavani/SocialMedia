@@ -219,7 +219,9 @@ INSERT INTO FriendRequest VALUES (1,3),
 	(2,4),
 	(1,5),
 	(2,6),
-	(5,4)
+	(5,4),
+	(1,2),
+	(3,4)
 
 GO
 SELECT * FROM [FriendRequest]
