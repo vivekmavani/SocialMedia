@@ -211,7 +211,28 @@ SELECT U.Uid,U.Name FROM FriendAccapte FA JOIN Users U ON FA.Uid = U.Uid WHERE F
 --UN FRIEND
 DELETE FROM [dbo].[FriendAccapte]
 
+-- send friend request 
+INSERT INTO FriendRequest VALUES (1,3),
+	(2,3),
+	(2,4),
+	(1,5),
+	(2,6),
+	(5,4)
 
+GO
+SELECT * FROM [FriendRequest]
+-- dispaly friend request by id
+SELECT a.Name,a.Uid FROM Users a JOIN FriendRequest b ON a.Uid = b.Frid_r WHERE b.Uid_s = 1  
+-- delete request 
+DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
+--  acceapte request
+
+
+INSERT INTO FriendAccapte VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
+                                  (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
+DELETE FROM FriendRequest WHERE FriendRequestid = 6
+SELECT * FROM FriendAccapte 
+SELECT * FROM FriendRequest
 
 
 
