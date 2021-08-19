@@ -134,9 +134,15 @@ INSERT INTO Chat VALUES
 (4,3,'I am learning HTML','2021-08-19 13:29:22.713')
 
 
+INSERT INTO Chat VALUES
+((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
+
+INSERT INTO Chat VALUES
+((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
+((SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
 
 DECLARE @Sender int
-SET @Sender = 3
+SET @Sender = 2
 
 DECLARE @Receiver int
 SET @Receiver = 4
@@ -244,3 +250,6 @@ SELECT * FROM FriendRequest
 --Declare @Encrypt varbinary(200)  
 --Select @Encrypt = EncryptByPassPhrase('key', 'Jothish' )  
 --Select @Encrypt as Encrypt 
+
+
+SELECT * FROM Chat
