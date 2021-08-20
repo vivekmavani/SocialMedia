@@ -10,7 +10,7 @@ Email varchar(30) not null CONSTRAINT Email_validation CHECK(Email LIKE'%_@__%._
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 Created_date DATE  DEFAULT GETDATE(),
 Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
-Password varbinary(100) not null
+Password varchar(200) not null
 )
 CREATE TABLE Categories
 (
@@ -391,35 +391,24 @@ select Category_Name from Categories where Category_ID IN (select Category_ID fr
 
 select category_ID, category_name from Categories where Category_ID NOT IN (select Category_ID from post)
 
---all likes count
-SELECT SUM(Likes) FROM Post
+/* Comment table */
 
---category vies like
-SELECT C.Category_Name , sum(P.Likes) AS Category_Likes FROM Categories C JOIN Post P ON C.Category_ID = P.Category_ID
-GROUP BY C.Category_Name
+Create Table Comment(
+Comment_Id INT PRIMARY KEY IDENTITY(1,1),
+Comment_Text VARCHAR(100),
+Uid INT Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
+Pid INT Constraint Pfk FOREIGN key REFERENCES Post(Pid)
+)
 
---Name vies like
-SELECT u.Name ,sum(p.likes) FROM Post P join Users u on u.Uid = p.Uid group by (u.Name)
+INSERT INTO Comment
+Values
+('Nice Pic',1,2),
+('Beautifull',2,3),
+('Great Picture',2,4),
+('Good',5,3),
+('Nice Place',3,6)
 
---User has post like was grater then 30
-SELECT u.Name ,sum(p.likes) FROM Post P join Users u on u.Uid = p.Uid group by (u.Name) 
-HAVING SUM(P.LIKES)>30
+select * from Comment
 
---like vias
-SELECT * FROM Post ORDER BY Likes
 
---avg to lowest like category name
-SELECT C.Category_Name,SUM(P.Likes) FROM Categories C LEFT JOIN Post P ON C.Category_ID = P.Category_ID 
-GROUP BY Category_Name  HAVING SUM(P.LIKES)>(SELECT AVG(Likes) FROM Post) ORDER BY SUM(P.Likes) DESC
 
---higest friend user
-SELECT U.Name ,COUNT(FA.Frid),U.Uid FROM FriendAccapte FA JOIN Users U ON U.Uid = FA.Frid
-GROUP BY U.Name,U.Uid
-
---higest friend request
-SELECT TOP 1 U.Name,COUNT (FR.Frid_r) FROM FriendRequest FR JOIN Users U ON U.Uid = FR.Frid_r
-GROUP BY U.Name ORDER BY COUNT(FR.FRID_R) DESC
-
---highest post in categories
-SELECT DENSE_RANK() OVER(ORDER BY COUNT(P.PID) DESC),C.Category_Name,COUNT(P.Pid) FROM Categories C  JOIN Post P ON C.Category_ID = P.Category_ID
-GROUP BY Category_Name
