@@ -10,7 +10,7 @@ Email varchar(30) not null CONSTRAINT Email_validation CHECK(Email LIKE'%_@__%._
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 Created_date DATE  DEFAULT GETDATE(),
 Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
-Password varchar(200) not null
+Password varbinary(100) not null
 )
 CREATE TABLE Categories
 (
