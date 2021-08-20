@@ -412,3 +412,9 @@ select * from Comment
 
 
 
+--highest post in categories
+SELECT DENSE_RANK() OVER(ORDER BY COUNT(P.PID) DESC),C.Category_Name,COUNT(P.Pid) FROM Categories C  JOIN Post P ON C.Category_ID = P.Category_ID
+GROUP BY Category_Name
+
+-- add dob in users
+ALTER TABLE Users ADD dateofbirth DATE
