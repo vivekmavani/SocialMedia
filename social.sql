@@ -418,3 +418,31 @@ GROUP BY Category_Name
 
 -- add dob in users
 ALTER TABLE Users ADD dateofbirth DATE
+
+
+-- Display username with max like on photo and users photo belongs to category name starts with A
+
+
+SELECT TOP 1 u.name as 'name',MAX(p.Likes) as 'max_like' FROM Users u
+	JOIN Post p ON p.Uid = u.Uid
+	JOIN Categories c ON c.Category_ID = p.Category_ID
+WHERE c.Category_Name LIKE 'A%'
+GROUP BY u.Name
+ORDER BY max_like DESC
+
+
+-- List of users commented on Prit's post
+
+SELECT c.Uid,u.Name FROM Comment c
+	JOIN Users u ON u.Uid = c.Uid
+WHERE c.Pid = (SELECT Uid FROM Users WHERE Name = 'prit')
+
+
+
+-- Name of user on which Romish commented
+
+SELECT u.Name FROM Users u
+WHERE u.Uid IN 
+( SELECT p.Uid FROM Post p WHERE p.Pid IN 
+(SELECT c.Pid FROM Comment c WHERE c.Uid = (SELECT Uid FROM Users WHERE Name = 'Romish')))
+
