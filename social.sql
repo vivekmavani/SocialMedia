@@ -29,6 +29,10 @@ Category_ID int  CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories
 Uid int  CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
 )
 
+--Post date add
+ALTER TABLE POST
+ADD Post_Date Date DEFAULT GETDATE();
+
 CREATE TABLE FriendRequest
 (
 FriendRequestid int  CONSTRAINT FriendRequestid_Post PRIMARY KEY  IDENTITY(1,1),
@@ -423,3 +427,6 @@ GROUP BY U.Name ORDER BY COUNT(FR.FRID_R) DESC
 --highest post in categories
 SELECT DENSE_RANK() OVER(ORDER BY COUNT(P.PID) DESC),C.Category_Name,COUNT(P.Pid) FROM Categories C  JOIN Post P ON C.Category_ID = P.Category_ID
 GROUP BY Category_Name
+
+--TODAY'S Tranding post like vias
+SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = GETDATE()  ORDER BY P.Likes DESC
