@@ -517,10 +517,7 @@ SELECT * FROM Post WHERE Pid IN(SELECT Pid FROM Likebyuser WHERE Uid = 1)
 -- who likes the post 
 SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.Uid WHERE Pid = 3
 
--- recommended post by like 
-SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid
-   FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE
-   a.Category_ID IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
+
  
 -- display post by your friends likes
    SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid
