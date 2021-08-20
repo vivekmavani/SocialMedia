@@ -235,6 +235,12 @@ DECLARE @UNFriendAccid INT
 SET @UNFriendAccid = 1
 DELETE FROM [dbo].[FriendAccapte] WHERE FriendAccapteid = @UNFriendAccid 
 
+--TODAY'S Tranding post like vias
+SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
+
+--Display 18+ user name
+SELECT Name AS '18+ NAME',DATEDIFF(YY,dateofbirth,getdate()) as age FROM Users WHERE DATEDIFF(YY,dateofbirth,getdate())>18
+
 -- send friend request 
 INSERT INTO FriendRequest VALUES (1,3),
 	(2,3),
@@ -395,38 +401,58 @@ select Category_Name from Categories where Category_ID IN (select Category_ID fr
 
 select category_ID, category_name from Categories where Category_ID NOT IN (select Category_ID from post)
 
---all likes count
-SELECT SUM(Likes) FROM Post
+/* Comment table */
 
---category vies like
-SELECT C.Category_Name , sum(P.Likes) AS Category_Likes FROM Categories C JOIN Post P ON C.Category_ID = P.Category_ID
-GROUP BY C.Category_Name
+Create Table Comment(
+Comment_Id INT PRIMARY KEY IDENTITY(1,1),
+Comment_Text VARCHAR(100),
+Uid INT Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
+Pid INT Constraint Pfk FOREIGN key REFERENCES Post(Pid)
+)
 
---Name vies like
-SELECT u.Name ,sum(p.likes) FROM Post P join Users u on u.Uid = p.Uid group by (u.Name)
+INSERT INTO Comment
+Values
+('Nice Pic',1,2),
+('Beautifull',2,3),
+('Great Picture',2,4),
+('Good',5,3),
+('Nice Place',3,6)
 
---User has post like was grater then 30
-SELECT u.Name ,sum(p.likes) FROM Post P join Users u on u.Uid = p.Uid group by (u.Name) 
-HAVING SUM(P.LIKES)>30
+select * from Comment
 
---like vias
-SELECT * FROM Post ORDER BY Likes
 
---avg to lowest like category name
-SELECT C.Category_Name,SUM(P.Likes) FROM Categories C LEFT JOIN Post P ON C.Category_ID = P.Category_ID 
-GROUP BY Category_Name  HAVING SUM(P.LIKES)>(SELECT AVG(Likes) FROM Post) ORDER BY SUM(P.Likes) DESC
-
---higest friend user
-SELECT U.Name ,COUNT(FA.Frid),U.Uid FROM FriendAccapte FA JOIN Users U ON U.Uid = FA.Frid
-GROUP BY U.Name,U.Uid
-
---higest friend request
-SELECT TOP 1 U.Name,COUNT (FR.Frid_r) FROM FriendRequest FR JOIN Users U ON U.Uid = FR.Frid_r
-GROUP BY U.Name ORDER BY COUNT(FR.FRID_R) DESC
 
 --highest post in categories
 SELECT DENSE_RANK() OVER(ORDER BY COUNT(P.PID) DESC),C.Category_Name,COUNT(P.Pid) FROM Categories C  JOIN Post P ON C.Category_ID = P.Category_ID
 GROUP BY Category_Name
 
---TODAY'S Tranding post like vias
-SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = GETDATE()  ORDER BY P.Likes DESC
+-- add dob in users
+ALTER TABLE Users ADD dateofbirth DATE
+
+
+-- Display username with max like on photo and users photo belongs to category name starts with A
+
+
+SELECT TOP 1 u.name as 'name',MAX(p.Likes) as 'max_like' FROM Users u
+	JOIN Post p ON p.Uid = u.Uid
+	JOIN Categories c ON c.Category_ID = p.Category_ID
+WHERE c.Category_Name LIKE 'A%'
+GROUP BY u.Name
+ORDER BY max_like DESC
+
+
+-- List of users commented on Prit's post
+
+SELECT c.Uid,u.Name FROM Comment c
+	JOIN Users u ON u.Uid = c.Uid
+WHERE c.Pid = (SELECT Uid FROM Users WHERE Name = 'prit')
+
+
+
+-- Name of user on which Romish commented
+
+SELECT u.Name FROM Users u
+WHERE u.Uid IN 
+( SELECT p.Uid FROM Post p WHERE p.Pid IN 
+(SELECT c.Pid FROM Comment c WHERE c.Uid = (SELECT Uid FROM Users WHERE Name = 'Romish')))
+
