@@ -241,6 +241,13 @@ SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT
 --Display 18+ user name
 SELECT Name AS '18+ NAME',DATEDIFF(YY,dateofbirth,getdate()) as age FROM Users WHERE DATEDIFF(YY,dateofbirth,getdate())>18
 
+--less than 18 to not show album , financial service,home improvement etc. like categories post
+
+SELECT * FROM Post WHERE Category_ID IN 
+(SELECT Category_ID FROM Categories WHERE Category_Name NOT IN ('album','financial service','home improvement'))
+AND (SELECT DATEDIFF(YY,dateofbirth,GETDATE()) FROM Users WHERE Uid = 9)<18
+
+
 -- send friend request 
 INSERT INTO FriendRequest VALUES (1,3),
 	(2,3),
@@ -530,3 +537,4 @@ ON a.Category_ID = b.Category_ID WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE
 Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid = 5)
 OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  = 5))) 
 
+--
