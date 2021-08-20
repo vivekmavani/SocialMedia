@@ -265,3 +265,8 @@ SELECT * FROM FriendRequest
 
 
 SELECT * FROM Chat
+
+-- friend suggestions 
+SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid  
+IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  
+IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) 
