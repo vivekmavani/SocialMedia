@@ -486,3 +486,50 @@ select title from post where pid =
 (select pid from 
 (select TOP 1 count(pid) "comment",pid 
 from comment group by pid order by comment DESC )temp)
+
+----- Like ------
+-- add Likebyuser Table 
+CREATE TABLE Likebyuser
+(
+Likeid int  not null CONSTRAINT Likeid_Likebyuser PRIMARY KEY  IDENTITY(1,1),
+Pid int  CONSTRAINT Pid_Likebyuser FOREIGN KEY  REFERENCES  Post(Pid) ON DELETE CASCADE ON UPDATE CASCADE,
+Uid int CONSTRAINT Uid_Likebyusers FOREIGN KEY  REFERENCES  Users(Uid) 
+)
+--TODAY'S Tranding post like vias
+SELECT Pid,Title,Likes,dateofpost FROM Post  WHERE dateofpost = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
+
+Select * FROM Likebyuser
+
+--add like by users
+DECLARE @POSTID INT
+SET @POSTID = 4
+UPDATE Post SET Likes = Likes + 1 WHERE Pid = @POSTID
+INSERT INTO Likebyuser VALUES(@POSTID,1) 
+UPDATE Post SET Likes = Likes + 1 WHERE Pid = 4
+INSERT INTO Likebyuser VALUES(4,2) 
+-- delete dislike by user
+UPDATE Post SET Likes = Likes - 1 WHERE Pid = 4 AND Likes  <>0
+DELETE Likebyuser WHERE Pid = 4 AND Uid = 1
+
+--display post like by user
+SELECT * FROM Post WHERE Pid IN(SELECT Pid FROM Likebyuser WHERE Uid = 1)
+
+-- who likes the post 
+SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.Uid WHERE Pid = 3
+
+-- recommended post by like 
+SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid
+   FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE
+   a.Category_ID IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
+ 
+-- display post by your friends likes
+   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid
+   FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE b.Category_ID
+   IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
+
+--  display recommended post like by your friend 
+SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid FROM Post a JOIN Categories b
+ON a.Category_ID = b.Category_ID WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE Uid IN (SELECT Uid FROM  Users WHERE
+Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid = 5)
+OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  = 5))) 
+
