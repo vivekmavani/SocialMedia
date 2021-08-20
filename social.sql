@@ -270,3 +270,56 @@ SELECT * FROM Chat
 SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid  
 IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  
 IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) 
+
+
+
+/*1. Write a query to display all details of private account */
+
+select * from Users where Visible = 0;
+
+/*2. Write query to display total account from city */
+
+select count(uid) "Account",City from Users group by city order by Account DESC
+
+/*3. Write a query to display name and city of users who are from rajkot or jamnagar*/
+
+select Name,City from Users where City IN ('Rajkot','Jamnagar')
+
+/*write a query to display category name start with H*/
+
+select category_name from Categories where Category_Name like 'H%'
+
+/*4. Write a query to display title of post and catagary name of user neeel*/
+
+select name,Title,Category_Name 
+from Users
+join Post
+on Users.Uid=post.Uid
+join Categories
+on Categories.Category_ID = post.Category_ID
+where Users.Name = 'Neel'
+
+/*5. write a query to display friend name of user romish*/
+
+select u.name from Users "u" where u.Uid IN 
+(select fa.frid from FriendAccapte "fa" where fa.uid = 
+(select uid from Users where name = 'Romish')) 
+
+/*6. write a query to display all the message send by hiren*/
+
+select Msg from Chat
+join Users
+on users.Uid = chat.Sender
+where name = 'Hiren' 
+
+/*7. write a query to display total number of friend of user hiren*/
+
+select count(frid) from FriendAccapte as "friend of hiren" where Uid IN (select uid from users where name = 'Hiren')
+
+/*8. write a query to display catagory all categories used by user order by category name*/
+
+select Category_Name from Categories where Category_ID IN (select Category_ID from Post) ORDER by Category_Name
+
+/*9. write a query display category name which is never possted by any user*/
+
+select category_ID, category_name from Categories where Category_ID NOT IN (select Category_ID from post)
