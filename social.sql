@@ -265,3 +265,71 @@ SELECT * FROM FriendRequest
 
 
 SELECT * FROM Chat
+
+SELECT * FROM Categories
+
+SELECT * FROM Users
+
+-- Display category name of user post
+
+SELECT c.Category_Name FROM Categories c
+	INNER JOIN Post p ON p.Category_ID = c.Category_ID
+	INNER JOIN Users u ON u.Uid = p.Uid
+WHERE u.Name = 'Prit'
+
+
+-- Display mutual friends
+
+SELECT u.Name FROM Users u WHERE u.Uid IN 
+(
+SELECT fa.Frid FROM FriendAccapte fa
+WHERE fa.Uid = 2
+INTERSECT
+SELECT fa.Frid FROM FriendAccapte fa
+WHERE fa.Uid = 5
+)
+
+
+-- All users with its category name of Post
+
+SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
+	LEFT JOIN Post p ON p.Uid = u.Uid
+	LEFT JOIN Categories c ON c.Category_ID = p.Category_ID
+
+
+
+
+-- List of friends
+SELECT f.Frid,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid) as 'friend_name' FROM FriendAccapte f
+	JOIN Users u ON u.Uid = f.Uid 
+WHERE u.Name = 'Hiren'
+ORDER BY f.Frid
+
+
+
+-- List of users who have not posted anything
+SELECT Name,Uid FROM Users
+WHERE uid NOT IN (SELECT Uid FROM Post)
+
+
+-- Number of Post of all users
+SELECT COUNT(Pid) as 'no. of post',
+		Uid,
+		(SELECT Name FROM Users WHERE Uid = Post.Uid) as 'Name' 
+FROM Post 
+GROUP BY Uid
+
+
+
+-- List of users with 0 friends
+SELECT Uid FROM Users 
+WHERE Uid NOT IN (SELECT Uid FROM FriendAccapte)
+
+
+
+-- Users with total friends
+SELECT u.Uid,
+		u.Name,
+		(SELECT COUNT(f.Frid) FROM FriendAccapte f WHERE f.Uid = u.Uid GROUP BY f.Uid) as 'No of friends'
+FROM Users u
+
