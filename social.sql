@@ -381,6 +381,10 @@ where Users.Name = 'Neel'
 select u.name from Users "u" where u.Uid IN 
 (select fa.frid from FriendAccapte "fa" where fa.uid = 
 (select uid from Users where name = 'Romish')) 
+OR
+u.Uid IN 
+(select fa.uid from FriendAccapte "fa" where fa.Frid = 
+(select uid from Users where name = 'Romish'))
 
 /*6. write a query to display all the message send by hiren*/
 
@@ -456,3 +460,29 @@ WHERE u.Uid IN
 ( SELECT p.Uid FROM Post p WHERE p.Pid IN 
 (SELECT c.Pid FROM Comment c WHERE c.Uid = (SELECT Uid FROM Users WHERE Name = 'Romish')))
 
+/*10. Write a query to display comment made by Prit*/
+
+Select Comment_Text from Comment where Uid = 
+(select Uid from users where name = 'Prit')
+
+/*11. Write a query to display comment made on vivek's post*/
+
+select comment_text from comment where pid IN 
+(select pid from post where uid = 
+(select uid from users where name = 'vivek'))
+
+/*12. Write a query to display comment made on vivek's post with username*/
+
+select comment_text,name from comment 
+join users 
+on Comment.Uid = Users.Uid 
+where pid IN 
+(select pid from post where uid = 
+(select uid from users where name = 'vivek'))
+
+/*13. Write a query to display a post on which maximum comments are made*/
+
+select title from post where pid = 
+(select pid from 
+(select TOP 1 count(pid) "comment",pid 
+from comment group by pid order by comment DESC )temp)
