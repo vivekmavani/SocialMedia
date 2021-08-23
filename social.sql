@@ -325,12 +325,12 @@ INSERT INTO FriendAccept VALUES (1,3),
 
 --DISPLAY FRIEND
 
-SELECT U.Uid,U.Name FROM FriendAccapte FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
+SELECT U.Uid,U.Name FROM FriendAccapt FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
 
 --UN FRIEND
 DECLARE @UNFriendAccid INT
 SET @UNFriendAccid = 1
-DELETE FROM [dbo].[FriendAccapte] WHERE FriendAccapteid = @UNFriendAccid 
+DELETE FROM [dbo].[FriendAccapt] WHERE FriendAccapteid = @UNFriendAccid 
 
 --TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
@@ -371,10 +371,10 @@ DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
 --  acceapte request
 
 
-INSERT INTO FriendAccapte VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
+INSERT INTO FriendAccapt VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
                                   (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
 DELETE FROM FriendRequest WHERE FriendRequestid = 6
-SELECT * FROM FriendAccapte 
+SELECT * FROM FriendAccapt 
 SELECT * FROM FriendRequest
 
 
@@ -619,16 +619,15 @@ SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.Uid WHERE Pid = 
 
  
 -- display post by your friends likes
-   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid
+   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid
    FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE b.Category_ID
    IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
 
 --  display recommended post like by your friend 
-SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid FROM Post a JOIN Categories b
+SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid FROM Post a JOIN Categories b
 ON a.Category_ID = b.Category_ID WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE Uid IN (SELECT Uid FROM  Users WHERE
-Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid = 5)
-OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  = 5))) 
-
+Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid = 5)
+OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  = 5))) 
 --
 
 INSERT INTO Groups VALUES
