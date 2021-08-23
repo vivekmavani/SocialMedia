@@ -26,7 +26,7 @@ Pid int  not null CONSTRAINT pid_Post PRIMARY KEY  IDENTITY(1,1),
 Title nvarchar(20) not null,
 Description ntext not null,
 Image nvarchar(MAX) not null CONSTRAINT Post_Image CHECK(Image LIKE('%.png')),
-Likes int,
+Likes int DEFAULT 0,
 Category_ID int  CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
 Uid int  CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
 )
