@@ -660,5 +660,35 @@ INSERT INTO GroupMessage(grp_id,userId,Message) VALUES
 (5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 4 ),'happy journey'),
 (5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'take care'),
 (5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'Good night')
+
+
+
+-- Queries for group chat
+
+-- Query to see names of all groups
+SELECT grp_name,GroupId FROM Groups 
+
+-- chat of group 1
+SELECT m.Message,u.Name FROM GroupMessage m
+	JOIN Users u ON u.Uid = m.UserID
+WHERE m.grp_id = 1
+
+-- Members of groupid 5
+SELECT gm.UserId,u.Name FROM GroupMember gm
+	JOIN Users u ON u.Uid = gm.UserId
+WHERE gm.Group_id = 5
+
+
+-- name of all members with group name 
+SELECT * FROM GroupMember gm
+	JOIN Users u ON u.Uid = gm.UserId
+
+
+-- display user name who is in more than 1 group
+SELECT u.Name FROM Users u
+	JOIN GroupMember m ON m.UserId = u.Uid
+GROUP BY u.Name
+HAVING COUNT(m.Group_id) > 1
+
 -- location
 SELECT * FROM dbo.Location
