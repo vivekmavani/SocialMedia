@@ -699,5 +699,19 @@ SELECT u.Name FROM Users u
 GROUP BY u.Name
 HAVING COUNT(m.Group_id) > 1
 
+
+-- Name of group with no members
+SELECT g.grp_name,g.GroupId FROM Groups g
+WHERE g.GroupId NOT IN (SELECT gm.Group_id FROM GroupMember gm)
+
+
+-- Group with max members
+SELECT * FROM 
+(SELECT DENSE_RANK() OVER(ORDER BY COUNT(g.GroupId) DESC) as 'rank',g.grp_name,COUNT(g.GroupId) as 'totalMember' FROM Groups g
+	JOIN GroupMember gm ON gm.Group_id = g.GroupId
+GROUP BY g.grp_name) temp
+WHERE rank = 1
+
+
 -- location
 SELECT * FROM dbo.Location
