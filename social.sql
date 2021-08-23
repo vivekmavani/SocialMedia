@@ -630,5 +630,35 @@ Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid = 5)
 OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  = 5))) 
 
 --
+
+INSERT INTO Groups VALUES
+('grp1','this is our college group',2,'2021-01-01'),
+('grp2','this is our School group',3,'2021-02-01'),
+('grp3','this is our office group',4,'2021-03-01'),
+('grp4','this is our Apartment group',5,'2021-04-04'),
+('grp5','this is our Friends group',2,'2021-08-05')
+
+
+INSERT INTO GroupMember VALUES
+(1,(SELECT uid FROM Users WHERE Uid = 1),'2021-01-02'),
+(1,(SELECT uid FROM Users WHERE Uid = 2),'2021-01-01'),
+(1,(SELECT uid FROM Users WHERE Uid = 3),'2021-01-02'),
+(1,(SELECT uid FROM Users WHERE Uid = 4),'2021-01-02'),
+(2,(SELECT uid FROM Users WHERE Uid = 3),'2021-02-01'),
+(2,(SELECT uid FROM Users WHERE Uid = 5),'2021-02-02'),
+(2,(SELECT uid FROM Users WHERE Uid = 6),'2021-02-02'),
+(5,(SELECT uid FROM Users WHERE Uid = 4),'2021-08-06'),
+(5,(SELECT uid FROM Users WHERE Uid = 5),'2021-08-06'),
+(5,(SELECT uid FROM Users WHERE Uid = 2),'2021-08-05')
+
+INSERT INTO GroupMessage(grp_id,userId,Message) VALUES
+(1,(SELECT UserId FROM GroupMember WHERE Group_id = 1 AND UserId = 2 ),'hello every one'),
+(1,(SELECT UserId FROM GroupMember WHERE Group_id = 1 AND UserId = 3 ),'hi how are you'),
+(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 3 ),'hello'),
+(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 5 ),'good morning'),
+(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 6 ),'good evening'),
+(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 4 ),'happy journey'),
+(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'take care'),
+(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'Good night')
 -- location
 SELECT * FROM dbo.Location
