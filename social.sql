@@ -87,7 +87,7 @@ GroupId int not null PRIMARY KEY IDENTITY(1,1),
 grp_name varchar(30) not null,
 grp_description varchar(100) not null,
 created_by int not null CONSTRAINT grp_lead FOREIGN KEY REFERENCES Users(Uid),
-createdAt datetime not null default GETDATE(),
+createdAt datetime default GETDATE()
 )
 
 -- group members
@@ -96,7 +96,7 @@ CREATE TABLE GroupMember
 GrpMembar_id int not null PRIMARY KEY IDENTITY(1,1),
 Group_id int not null CONSTRAINT grp_member FOREIGN KEY REFERENCES Groups(GroupId) ON DELETE CASCADE ON UPDATE CASCADE,
 UserId int not null CONSTRAINT grpUid FOREIGN KEY REFERENCES Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
-date_joined date not null DEFAULT GETDATE(),
+date_joined date DEFAULT GETDATE(),
 CONSTRAINT unqMember UNIQUE(Group_id,UserId)
 )
 
@@ -106,8 +106,8 @@ CREATE TABLE GroupMessage
 grpMsg_id int not null PRIMARY KEY IDENTITY(1,1),
 grp_id int not null CONSTRAINT grpid FOREIGN KEY REFERENCES Groups(GroupId),
 UserID int not null CONSTRAINT grpMsgUid FOREIGN KEY REFERENCES Users(Uid),
-Message text not null,
-Sendtime Datetime not null DEFAULT GETDATE()
+Message ntext not null,
+Sendtime Datetime DEFAULT GETDATE()
 )
 
 USE [socialmedia]
