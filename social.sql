@@ -22,7 +22,7 @@ Created_date DATE  DEFAULT GETDATE(),
 Dateofbirth DATE not null,
 Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
 Password varbinary(200) not null,
-Gender varchar(2)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
+Gender not null nchar(1)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
 )
 CREATE TABLE Categories
 (
@@ -228,11 +228,11 @@ INSERT INTO Chat VALUES
 
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
+((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
-((SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
+((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
+((SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
 
 DECLARE @Sender int
 SET @Sender = 2
@@ -265,7 +265,7 @@ SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Users U ON P
 WHERE U.Visible = 1
 
 --DISPLAY ALL POST FOR ONLY FRIEND
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccapte FA ON P.Uid = FA.Uid
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccept FA ON P.Uid = FA.Uid
 
 --DISPLAY POST BUT CATAGORIES VISE
 SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Categories C ON 
@@ -325,12 +325,12 @@ INSERT INTO FriendAccept VALUES (1,3),
 
 --DISPLAY FRIEND
 
-SELECT U.Uid,U.Name FROM FriendAccapte FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
+SELECT U.Uid,U.Name FROM FriendAccapt FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
 
 --UN FRIEND
 DECLARE @UNFriendAccid INT
 SET @UNFriendAccid = 1
-DELETE FROM [dbo].[FriendAccapte] WHERE FriendAccapteid = @UNFriendAccid 
+DELETE FROM [dbo].[FriendAccapt] WHERE FriendAccapteid = @UNFriendAccid 
 
 --TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
@@ -371,10 +371,10 @@ DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
 --  acceapte request
 
 
-INSERT INTO FriendAccapte VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
+INSERT INTO FriendAccapt VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
                                   (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
 DELETE FROM FriendRequest WHERE FriendRequestid = 6
-SELECT * FROM FriendAccapte 
+SELECT * FROM FriendAccapt 
 SELECT * FROM FriendRequest
 
 
@@ -403,10 +403,10 @@ WHERE u.Name = 'Prit'
 
 SELECT u.Name FROM Users u WHERE u.Uid IN 
 (
-SELECT fa.Frid FROM FriendAccapte fa
+SELECT fa.Frid FROM FriendAccept fa
 WHERE fa.Uid = 2
 INTERSECT
-SELECT fa.Frid FROM FriendAccapte fa
+SELECT fa.Frid FROM FriendAccept fa
 WHERE fa.Uid = 5
 )
 
@@ -421,7 +421,7 @@ SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
 
 
 -- List of friends
-SELECT f.Frid,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid) as 'friend_name' FROM FriendAccapte f
+SELECT f.Frid,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid) as 'friend_name' FROM FriendAccept f
 	JOIN Users u ON u.Uid = f.Uid 
 WHERE u.Name = 'Hiren'
 ORDER BY f.Frid
@@ -444,20 +444,20 @@ GROUP BY Uid
 
 -- List of users with 0 friends
 SELECT Uid FROM Users 
-WHERE Uid NOT IN (SELECT Uid FROM FriendAccapte)
+WHERE Uid NOT IN (SELECT Uid FROM FriendAccept)
 
 
 
 -- Users with total friends
 SELECT u.Uid,
 		u.Name,
-		(SELECT COUNT(f.Frid) FROM FriendAccapte f WHERE f.Uid = u.Uid GROUP BY f.Uid) as 'No of friends'
+		(SELECT COUNT(f.Frid) FROM FriendAccept f WHERE f.Uid = u.Uid GROUP BY f.Uid) as 'No of friends'
 FROM Users u
 
 -- friend suggestions 
-SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid  
-IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  
-IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) 
+SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid  
+IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  
+IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) 
 
 
 
@@ -629,16 +629,15 @@ SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.Uid WHERE Pid = 
 
  
 -- display post by your friends likes
-   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid
+   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid
    FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE b.Category_ID
    IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
 
 --  display recommended post like by your friend 
-SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.dateofpost,a.Uid FROM Post a JOIN Categories b
+SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid FROM Post a JOIN Categories b
 ON a.Category_ID = b.Category_ID WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE Uid IN (SELECT Uid FROM  Users WHERE
-Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid = 5)
-OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  = 5))) 
-
+Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid = 5)
+OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  = 5))) 
 --
 
 INSERT INTO Groups VALUES
@@ -670,5 +669,35 @@ INSERT INTO GroupMessage(grp_id,userId,Message) VALUES
 (5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 4 ),'happy journey'),
 (5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'take care'),
 (5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'Good night')
+
+
+
+-- Queries for group chat
+
+-- Query to see names of all groups
+SELECT grp_name,GroupId FROM Groups 
+
+-- chat of group 1
+SELECT m.Message,u.Name FROM GroupMessage m
+	JOIN Users u ON u.Uid = m.UserID
+WHERE m.grp_id = 1
+
+-- Members of groupid 5
+SELECT gm.UserId,u.Name FROM GroupMember gm
+	JOIN Users u ON u.Uid = gm.UserId
+WHERE gm.Group_id = 5
+
+
+-- name of all members with group name 
+SELECT * FROM GroupMember gm
+	JOIN Users u ON u.Uid = gm.UserId
+
+
+-- display user name who is in more than 1 group
+SELECT u.Name FROM Users u
+	JOIN GroupMember m ON m.UserId = u.Uid
+GROUP BY u.Name
+HAVING COUNT(m.Group_id) > 1
+
 -- location
 SELECT * FROM dbo.Location
