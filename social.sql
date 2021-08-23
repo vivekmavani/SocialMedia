@@ -314,7 +314,7 @@ DELETE FROM [dbo].[Post]
 
 
 --FRIEND ACCAPTE TABLE DATA
-INSERT INTO FriendAccapte VALUES (1,3),
+INSERT INTO FriendAccept VALUES (1,3),
 	(2,3),
 	(2,4),
 	(1,5),
