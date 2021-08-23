@@ -22,7 +22,7 @@ Created_date DATE  DEFAULT GETDATE(),
 Dateofbirth DATE not null,
 Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
 Password varbinary(200) not null,
-Gender varchar(2)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
+Gender not null nchar(1)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
 )
 CREATE TABLE Categories
 (
