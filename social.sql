@@ -228,11 +228,11 @@ INSERT INTO Chat VALUES
 
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
+((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
-((SELECT DISTINCT Frid FROM FriendAccapte WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccapte WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
+((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
+((SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
 
 DECLARE @Sender int
 SET @Sender = 2
@@ -265,7 +265,7 @@ SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Users U ON P
 WHERE U.Visible = 1
 
 --DISPLAY ALL POST FOR ONLY FRIEND
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccapte FA ON P.Uid = FA.Uid
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccept FA ON P.Uid = FA.Uid
 
 --DISPLAY POST BUT CATAGORIES VISE
 SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Categories C ON 
@@ -403,10 +403,10 @@ WHERE u.Name = 'Prit'
 
 SELECT u.Name FROM Users u WHERE u.Uid IN 
 (
-SELECT fa.Frid FROM FriendAccapte fa
+SELECT fa.Frid FROM FriendAccept fa
 WHERE fa.Uid = 2
 INTERSECT
-SELECT fa.Frid FROM FriendAccapte fa
+SELECT fa.Frid FROM FriendAccept fa
 WHERE fa.Uid = 5
 )
 
@@ -421,7 +421,7 @@ SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
 
 
 -- List of friends
-SELECT f.Frid,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid) as 'friend_name' FROM FriendAccapte f
+SELECT f.Frid,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid) as 'friend_name' FROM FriendAccept f
 	JOIN Users u ON u.Uid = f.Uid 
 WHERE u.Name = 'Hiren'
 ORDER BY f.Frid
@@ -444,20 +444,20 @@ GROUP BY Uid
 
 -- List of users with 0 friends
 SELECT Uid FROM Users 
-WHERE Uid NOT IN (SELECT Uid FROM FriendAccapte)
+WHERE Uid NOT IN (SELECT Uid FROM FriendAccept)
 
 
 
 -- Users with total friends
 SELECT u.Uid,
 		u.Name,
-		(SELECT COUNT(f.Frid) FROM FriendAccapte f WHERE f.Uid = u.Uid GROUP BY f.Uid) as 'No of friends'
+		(SELECT COUNT(f.Frid) FROM FriendAccept f WHERE f.Uid = u.Uid GROUP BY f.Uid) as 'No of friends'
 FROM Users u
 
 -- friend suggestions 
-SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccapte WHERE Frid  
-IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccapte WHERE Uid  
-IN(SELECT Frid FROM FriendAccapte WHERE Uid  =1)) 
+SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid  
+IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  
+IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) 
 
 
 
@@ -490,11 +490,11 @@ where Users.Name = 'Neel'
 /*5. write a query to display friend name of user romish*/
 
 select u.name from Users "u" where u.Uid IN 
-(select fa.frid from FriendAccapte "fa" where fa.uid = 
+(select fa.frid from FriendAccept "fa" where fa.uid = 
 (select uid from Users where name = 'Romish')) 
 OR
 u.Uid IN 
-(select fa.uid from FriendAccapte "fa" where fa.Frid = 
+(select fa.uid from FriendAccept "fa" where fa.Frid = 
 (select uid from Users where name = 'Romish'))
 
 /*6. write a query to display all the message send by hiren*/
@@ -506,7 +506,7 @@ where name = 'Hiren'
 
 /*7. write a query to display total number of friend of user hiren*/
 
-select count(frid) from FriendAccapte as "friend of hiren" where Uid IN (select uid from users where name = 'Hiren')
+select count(frid) from FriendAccept as "friend of hiren" where Uid IN (select uid from users where name = 'Hiren')
 
 /*8. write a query to display catagory all categories used by user order by category name*/
 
