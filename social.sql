@@ -325,12 +325,12 @@ INSERT INTO FriendAccept VALUES (1,3),
 
 --DISPLAY FRIEND
 
-SELECT U.Uid,U.Name FROM FriendAccapt FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
+SELECT U.Uid,U.Name FROM FriendAccept FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
 
 --UN FRIEND
 DECLARE @UNFriendAccid INT
 SET @UNFriendAccid = 1
-DELETE FROM [dbo].[FriendAccapt] WHERE FriendAccapteid = @UNFriendAccid 
+DELETE FROM [dbo].[FriendAccept] WHERE FriendAccapteid = @UNFriendAccid 
 
 --TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
@@ -371,10 +371,10 @@ DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
 --  acceapte request
 
 
-INSERT INTO FriendAccapt VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
+INSERT INTO FriendAccept VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
                                   (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
 DELETE FROM FriendRequest WHERE FriendRequestid = 6
-SELECT * FROM FriendAccapt 
+SELECT * FROM FriendAccept 
 SELECT * FROM FriendRequest
 
 
