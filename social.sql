@@ -1,15 +1,25 @@
 -- create database
-CREATE DATABASE socialmedia
-USE socialmedia
+CREATE DATABASE socialmedia1
+
+USE socialmedia1
+Create Table Location(
+Locationid INT PRIMARY KEY IDENTITY(1,1),
+City VARCHAR(20) not null,
+State VARCHAR(20) not null,
+Country VARCHAR(20) not null,
+)
+
+
 CREATE TABLE Users
 (
 Uid int  CONSTRAINT uid_User PRIMARY KEY  IDENTITY(1,1),
 Name varchar(50) not null,
-Cityid int   CONSTRAINT Cityid_Users FOREIGN KEY  REFERENCES  Location(Locationid) ON DELETE CASCADE ON UPDATE CASCADE,
-Address not null nvarchar(200),
-Email nvarchar(50) not null CONSTRAINT Email_validation CHECK(Email LIKE'%_@__%.__%')
+Locationid int  CONSTRAINT Cityid_Users FOREIGN KEY  REFERENCES  Location(Locationid) ON DELETE CASCADE ON UPDATE CASCADE,
+Address nvarchar(200) not null,
+Email nvarchar(50) not null CONSTRAINT Email_validation CHECK(Email LIKE '%_@__%.__%'),
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 Created_date DATE  DEFAULT GETDATE(),
+Dateofbirth DATE not null,
 Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
 Password varbinary(200) not null,
 Gender varchar(2)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
@@ -29,11 +39,8 @@ Image nvarchar(MAX) not null CONSTRAINT Post_Image CHECK(Image LIKE('%.png')),
 Likes int DEFAULT 0,
 Category_ID int  CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
 Uid int  CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
+Post_Date Date DEFAULT GETDATE()
 )
-
---Post date add
-ALTER TABLE POST
-ADD Post_Date Date DEFAULT GETDATE();
 
 CREATE TABLE FriendRequest
 (
@@ -48,7 +55,7 @@ CREATE TABLE FriendAccapte
 FriendAccapteid int   CONSTRAINT FriendAccapteid_FriendAccapte PRIMARY KEY  IDENTITY(1,1),
 Uid int not null CONSTRAINT Uid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid) ,
 Frid int not null CONSTRAINT Frid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid),
-CONSTRAINT unique_FriendAccapte UNIQUE(Uid_s,Frid_r)
+CONSTRAINT unique_FriendAccapte UNIQUE(Uid,Frid)
 )
 CREATE TABLE Chat
 (
@@ -65,14 +72,6 @@ Comment_Text NVARCHAR(100),
 Uid INT not null Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
 Pid INT not null Constraint Pfk FOREIGN key REFERENCES Post(Pid)
 )
-
-Create Table Location(
-Locationid INT PRIMARY KEY IDENTITY(1,1),
-City VARCHAR(20) not null,
-State VARCHAR(20) not null,
-Country VARCHAR(20) not null,
-)
-
 -- add Likebyuser Table 
 CREATE TABLE Likebyuser
 (
@@ -141,6 +140,34 @@ INSERT INTO [dbo].[Categories]
 		   ('Website'),
 		   ('Zoo')
 GO
+
+INSERT INTO [dbo].[Location]
+           ([City]
+           ,[State]
+           ,[Country])
+     VALUES
+           ('Bhavnagar'
+           ,'Gujarat'
+           ,'India'),
+		    ('Rajkot'
+           ,'Gujarat'
+           ,'India'),
+		    ('Ahmedabad'
+           ,'Gujarat'
+           ,'India'),
+		    ('Surat'
+           ,'Gujarat'
+           ,'India'),
+		     ('Mumbai'
+           ,'Maharashtra'
+           ,'India'),
+		    ('Pune'
+           ,'Maharashtra'
+           ,'India')
+GO
+
+
+
 SELECT Category_Name 'Categories' FROM Categories ORDER BY Category_Name
 
 UPDATE [dbo].[Categories]
