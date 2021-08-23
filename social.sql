@@ -50,7 +50,7 @@ Frid_r int not null CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Use
 CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r)
 )
 
-CREATE TABLE FriendAccapte
+CREATE TABLE FriendAccept
 (
 FriendAccapteid int   CONSTRAINT FriendAccapteid_FriendAccapte PRIMARY KEY  IDENTITY(1,1),
 Uid int not null CONSTRAINT Uid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid) ,
@@ -277,15 +277,27 @@ SET @POSTID = 1
 UPDATE Post SET Likes = Likes + 1 WHERE Pid = @POSTID
 
 --ADD POST BY FRIEND
-INSERT INTO Post VALUES ('photos','check this post','img_10',20,1,1),
-	('like photo','check this post','img_101',10,2,3),
-	('educational','post','img_101',20,7,4),
-	('pubg','player','img_20',31,8,6),
-	('dr.','operation','img_31',2,6,5),
-	('new place','check out this post','img_100',30,1,4),
-	('sport','fun news','img_110',24,2,5),
-	('bajaj','loan work','img_50',2,4,5),
-	('decoration','fastival decor','img_21',30,10,8)
+	INSERT INTO [dbo].[Post]
+           ([Title]
+           ,[Description]
+           ,[Image]
+           ,[Likes]
+           ,[Category_ID]
+           ,[Uid]
+           ,[Post_Date])
+     VALUES
+         
+		    ('photos','check this post','img_10.png',20,1,1,GETDATE()),
+	('like photo','check this post','img_101.png',10,2,3,GETDATE()),
+	('educational','post','img_101.png',20,7,4,GETDATE()),
+	('pubg','player','img_20.png',31,8,6,GETDATE()),
+	('dr.','operation','img_31.png',2,6,5,GETDATE()),
+	('new place','check out this post','img_100.png',30,1,4,GETDATE()),
+	('sport','fun news','img_110.png',24,2,5,GETDATE()),
+	('bajaj','loan work','img_50.png',2,4,5,GETDATE()),
+	('decoration','fastival decor','img_21.png',30,23,8,GETDATE())
+GO
+
 
 --UPDATE POST BUT FRIEND
 UPDATE [dbo].[Post]
