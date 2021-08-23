@@ -26,7 +26,7 @@ Gender not null nchar(1)  CONSTRAINT employees_Gender check(Gender IN('M','F','O
 )
 CREATE TABLE Categories
 (
-Category_ID int PRIMARY KEY IDENTITY(1,1),
+Category_ID smallint constraint PK_Categories_Category_ID PRIMARY KEY IDENTITY(1,1),
 Category_Name varchar(20) not null
 )
 
@@ -37,7 +37,7 @@ Title nvarchar(20) not null,
 Description ntext not null,
 Image nvarchar(MAX) not null CONSTRAINT Post_Image CHECK(Image LIKE('%.png')),
 Likes int DEFAULT 0,
-Category_ID int not null CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
+Category_ID smallint not null CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
 Uid int not null CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
 Post_Date Date DEFAULT GETDATE()
 )
