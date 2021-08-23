@@ -4,13 +4,15 @@ USE socialmedia
 CREATE TABLE Users
 (
 Uid int  CONSTRAINT uid_User PRIMARY KEY  IDENTITY(1,1),
-Name varchar(20) not null,
-City varchar(20) not null,
-Email varchar(30) not null CONSTRAINT Email_validation CHECK(Email LIKE'%_@__%.__%')
+Name varchar(50) not null,
+Cityid int   CONSTRAINT Cityid_Users FOREIGN KEY  REFERENCES  Location(Locationid) ON DELETE CASCADE ON UPDATE CASCADE,
+Address not null nvarchar(200),
+Email nvarchar(50) not null CONSTRAINT Email_validation CHECK(Email LIKE'%_@__%.__%')
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 Created_date DATE  DEFAULT GETDATE(),
 Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
-Password varchar(200) not null
+Password varbinary(200) not null,
+Gender varchar(2)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
 )
 CREATE TABLE Categories
 (
@@ -21,9 +23,9 @@ Category_Name varchar(20) not null
 CREATE TABLE Post
 (
 Pid int  not null CONSTRAINT pid_Post PRIMARY KEY  IDENTITY(1,1),
-Title varchar(20) not null,
-Description varchar(100) not null,
-Image varchar(100) not null,
+Title nvarchar(20) not null,
+Description ntext not null,
+Image nvarchar(MAX) not null CONSTRAINT Post_Image CHECK(Image LIKE('%.png')),
 Likes int,
 Category_ID int  CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
 Uid int  CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -36,25 +38,47 @@ ADD Post_Date Date DEFAULT GETDATE();
 CREATE TABLE FriendRequest
 (
 FriendRequestid int  CONSTRAINT FriendRequestid_Post PRIMARY KEY  IDENTITY(1,1),
-Uid_s int  CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
-Frid_r int CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
+Uid_s int  not null CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid) ,
+Frid_r int not null CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
 CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r)
 )
 
 CREATE TABLE FriendAccapte
 (
 FriendAccapteid int   CONSTRAINT FriendAccapteid_FriendAccapte PRIMARY KEY  IDENTITY(1,1),
-Uid int  CONSTRAINT Uid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid) ,
-Frid int  CONSTRAINT Frid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid),
+Uid int not null CONSTRAINT Uid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid) ,
+Frid int not null CONSTRAINT Frid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid),
 CONSTRAINT unique_FriendAccapte UNIQUE(Uid_s,Frid_r)
 )
 CREATE TABLE Chat
 (
 Chat_id int PRIMARY KEY IDENTITY(1,1),
-Sender int CONSTRAINT SEND_FK FOREIGN KEY REFERENCES Users(uid),
-Receiver int CONSTRAINT RECEIVE_FK FOREIGN KEY REFERENCES Users(uid),
-Msg varchar(max) not null,
+Sender int not null CONSTRAINT SEND_FK FOREIGN KEY REFERENCES Users(uid),
+Receiver int not null CONSTRAINT RECEIVE_FK FOREIGN KEY REFERENCES Users(uid),
+Msg ntext not null,
 msg_time datetime DEFAULT GETDATE()
+)
+
+Create Table Comment(
+Comment_Id INT PRIMARY KEY IDENTITY(1,1),
+Comment_Text NVARCHAR(100),
+Uid INT not null Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
+Pid INT not null Constraint Pfk FOREIGN key REFERENCES Post(Pid)
+)
+
+Create Table Location(
+Locationid INT PRIMARY KEY IDENTITY(1,1),
+City VARCHAR(20) not null,
+State VARCHAR(20) not null,
+Country VARCHAR(20) not null,
+)
+
+-- add Likebyuser Table 
+CREATE TABLE Likebyuser
+(
+Likeid int  not null CONSTRAINT Likeid_Likebyuser PRIMARY KEY  IDENTITY(1,1),
+Pid int  CONSTRAINT Pid_Likebyuser FOREIGN KEY  REFERENCES  Post(Pid) ON DELETE CASCADE ON UPDATE CASCADE,
+Uid int not null CONSTRAINT Uid_Likebyusers FOREIGN KEY  REFERENCES  Users(Uid) 
 )
 
 USE [socialmedia]
@@ -407,12 +431,6 @@ select category_ID, category_name from Categories where Category_ID NOT IN (sele
 
 /* Comment table */
 
-Create Table Comment(
-Comment_Id INT PRIMARY KEY IDENTITY(1,1),
-Comment_Text VARCHAR(100),
-Uid INT Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
-Pid INT Constraint Pfk FOREIGN key REFERENCES Post(Pid)
-)
 
 INSERT INTO Comment
 Values
@@ -488,13 +506,7 @@ select title from post where pid =
 from comment group by pid order by comment DESC )temp)
 
 ----- Like ------
--- add Likebyuser Table 
-CREATE TABLE Likebyuser
-(
-Likeid int  not null CONSTRAINT Likeid_Likebyuser PRIMARY KEY  IDENTITY(1,1),
-Pid int  CONSTRAINT Pid_Likebyuser FOREIGN KEY  REFERENCES  Post(Pid) ON DELETE CASCADE ON UPDATE CASCADE,
-Uid int CONSTRAINT Uid_Likebyusers FOREIGN KEY  REFERENCES  Users(Uid) 
-)
+
 --TODAY'S Tranding post like vias
 SELECT Pid,Title,Likes,dateofpost FROM Post  WHERE dateofpost = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
 
