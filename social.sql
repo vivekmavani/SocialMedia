@@ -14,7 +14,7 @@ CREATE TABLE Users
 (
 Uid int  CONSTRAINT uid_User PRIMARY KEY  IDENTITY(1,1),
 Name varchar(50) not null,
-Locationid int not null CONSTRAINT Cityid_Users FOREIGN KEY  REFERENCES  Location(Locationid) ON DELETE CASCADE ON UPDATE CASCADE,
+Users_Locationid int not null CONSTRAINT Cityid_Users FOREIGN KEY  REFERENCES  Location(Locationid) ON DELETE CASCADE ON UPDATE CASCADE,
 Address nvarchar(200) not null,
 Email nvarchar(50) not null CONSTRAINT Email_validation CHECK(Email LIKE '%_@__%.__%'),
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
@@ -37,57 +37,57 @@ Title nvarchar(20) not null,
 Description ntext not null,
 Image nvarchar(MAX) not null CONSTRAINT Post_Image CHECK(Image LIKE('%.png')),
 Likes int DEFAULT 0,
-Category_ID smallint not null CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
-Uid int not null CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
+Post_Category_ID smallint not null CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
+Post_Uid int not null CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
 Post_Date Date DEFAULT GETDATE()
 )
 
 CREATE TABLE FriendRequest
 (
 FriendRequestid int  CONSTRAINT FriendRequestid_Post PRIMARY KEY  IDENTITY(1,1),
-Uid_s int  not null CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid) ,
-Frid_r int not null CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
+FriendRequest_Uid int  not null CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid) ,
+FriendRequest_Frid int not null CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
 CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r)
 )
 
-CREATE TABLE FriendAccept
+/*CREATE TABLE FriendAccept
 (
 FriendAccapteid int   CONSTRAINT FriendAccapteid_FriendAccapte PRIMARY KEY  IDENTITY(1,1),
 Uid int not null CONSTRAINT Uid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid) ,
 Frid int not null CONSTRAINT Frid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid),
 CONSTRAINT unique_FriendAccapte UNIQUE(Uid,Frid)
-)
+)*/
 CREATE TABLE Chat
 (
 Chat_id int PRIMARY KEY IDENTITY(1,1),
 Sender int not null CONSTRAINT SEND_FK FOREIGN KEY REFERENCES Users(uid),
 Receiver int not null CONSTRAINT RECEIVE_FK FOREIGN KEY REFERENCES Users(uid),
 Msg ntext not null,
-msg_time datetime DEFAULT GETDATE()
+Msg_Time datetime DEFAULT GETDATE()
 )
 
 Create Table Comment(
 Comment_Id INT CONSTRAINT PK_Comment_Comment_Id PRIMARY KEY IDENTITY(1,1),
 Comment_Text NVARCHAR(100),
-Uid INT not null Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
-Pid INT not null Constraint Pfk FOREIGN key REFERENCES Post(Pid)
+Comment_Uid INT not null Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
+Comment_Pid INT not null Constraint Pfk FOREIGN key REFERENCES Post(Pid)
 )
 -- add Likebyuser Table 
 CREATE TABLE Likebyuser
 (
 Likeid int  not null CONSTRAINT Likeid_Likebyuser PRIMARY KEY  IDENTITY(1,1),
-Pid int not null CONSTRAINT Pid_Likebyuser FOREIGN KEY  REFERENCES  Post(Pid) ON DELETE CASCADE ON UPDATE CASCADE,
-Uid int not null CONSTRAINT Uid_Likebyusers FOREIGN KEY  REFERENCES  Users(Uid) 
+LikebyUser_Pid int not null CONSTRAINT Pid_Likebyuser FOREIGN KEY  REFERENCES  Post(Pid) ON DELETE CASCADE ON UPDATE CASCADE,
+LikebyUser_Uid int not null CONSTRAINT Uid_Likebyusers FOREIGN KEY  REFERENCES  Users(Uid) 
 )
 
 -- group table
 CREATE TABLE Groups
 (
 GroupId int CONSTRAINT PK_Groups_GroupID PRIMARY KEY IDENTITY(1,1),
-grp_name varchar(30) not null,
-grp_description varchar(100) not null,
-created_by int not null CONSTRAINT grp_lead FOREIGN KEY REFERENCES Users(Uid),
-createdAt datetime default GETDATE()
+Grp_Name varchar(30) not null,
+Grp_Description varchar(100) not null,
+Created_By int not null CONSTRAINT grp_lead FOREIGN KEY REFERENCES Users(Uid),
+CreatedAt datetime default GETDATE()
 )
 
 -- group members
@@ -95,18 +95,18 @@ CREATE TABLE GroupMember
 (
 GrpMembar_id int CONSTRAINT PK_GroupMember_GrpMembar_id PRIMARY KEY IDENTITY(1,1),
 Group_id int not null CONSTRAINT grp_member FOREIGN KEY REFERENCES Groups(GroupId) ON DELETE CASCADE ON UPDATE CASCADE,
-UserId int not null CONSTRAINT grpUid FOREIGN KEY REFERENCES Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
-date_joined date DEFAULT GETDATE(),
+GroupMember_Uid int not null CONSTRAINT grpUid FOREIGN KEY REFERENCES Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
+Date_joined date DEFAULT GETDATE(),
 CONSTRAINT unqMember UNIQUE(Group_id,UserId)
 )
 
 -- group message
 CREATE TABLE GroupMessage
 (
-grpMsg_id int not null CONSTRAINT PK_GroupMessage_GrpMsg_id PRIMARY KEY IDENTITY(1,1),
-grp_id int not null CONSTRAINT grpid FOREIGN KEY REFERENCES Groups(GroupId),
-UserID int not null CONSTRAINT grpMsgUid FOREIGN KEY REFERENCES Users(Uid),
-Message ntext not null,
+GroupMessage_Groupid INT NOT NULL CONSTRAINT PK_GroupMessage_Groupid PRIMARY KEY IDENTITY(1,1),
+Grp_id INT NOT NULL CONSTRAINT grpid FOREIGN KEY REFERENCES Groups(GroupId),
+GroupMessage_Uid INT NOT NULL CONSTRAINT grpMsgUid FOREIGN KEY REFERENCES Users(Uid),
+Message NTEXT NOT NULL,
 Sendtime Datetime DEFAULT GETDATE()
 )
 
@@ -116,6 +116,25 @@ CREATE TABLE Tags(
 	Tags_Pid INT NOT NULL CONSTRAINT FK_Tags_Post_Tags_Pid FOREIGN KEY REFERENCES Post(Pid),
 	Tags_Uid INT NOT NULL CONSTRAINT FK_Tags_Users_Tags_Uid FOREIGN KEY REFERENCES Users(Uid)
 )
+
+-- Master table
+CREATE TABLE Master
+(
+Master_id INT NOT NULL CONSTRAINT PK_Master_Master_id PRIMARY KEY IDENTITY(1,1),
+Master_Value VARCHAR(20) NOT NULL ,
+Master_SubValue VARCHAR(20) NOT NULL
+)
+
+
+-- Insert data in master
+INSERT INTO Master VALUES
+('Visibility','Private'),
+('Visibility','Public'),
+('Gender','Male'),
+('Gender','Female'),
+('Gender','Other'),
+('Status','Online'),
+('Status','Offline')
 
 USE [socialmedia]
 GO
@@ -337,7 +356,7 @@ SELECT U.Uid,U.Name FROM FriendAccept FA JOIN Users U ON FA.Uid = U.Uid WHERE FA
 --UN FRIEND
 DECLARE @UNFriendAccid INT
 SET @UNFriendAccid = 1
-DELETE FROM [dbo].[FriendAccapt] WHERE FriendAccapteid = @UNFriendAccid 
+DELETE FROM [dbo].[FriendAccept] WHERE FriendAccapteid = @UNFriendAccid 
 
 --TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
@@ -705,6 +724,20 @@ SELECT u.Name FROM Users u
 	JOIN GroupMember m ON m.UserId = u.Uid
 GROUP BY u.Name
 HAVING COUNT(m.Group_id) > 1
+
+
+-- Name of group with no members
+SELECT g.grp_name,g.GroupId FROM Groups g
+WHERE g.GroupId NOT IN (SELECT gm.Group_id FROM GroupMember gm)
+
+
+-- Group with max members
+SELECT * FROM 
+(SELECT DENSE_RANK() OVER(ORDER BY COUNT(g.GroupId) DESC) as 'rank',g.grp_name,COUNT(g.GroupId) as 'totalMember' FROM Groups g
+	JOIN GroupMember gm ON gm.Group_id = g.GroupId
+GROUP BY g.grp_name) temp
+WHERE rank = 1
+
 
 -- location
 SELECT * FROM dbo.Location
