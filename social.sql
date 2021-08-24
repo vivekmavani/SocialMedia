@@ -741,9 +741,11 @@ SELECT * FROM dbo.Location
 ALTER TABLE Users
 ADD Status int CONSTRAINT chk_status FOREIGN KEY REFERENCES Master(Master_id)
 
+ALTER TABLE Users
+ADD CONSTRAINT status_check CHECK(Status IN (6,7))
+
 UPDATE Users
 SET Status = 6 WHERE Uid = 1
-
 
 UPDATE Users
 SET Status = 6 WHERE Uid IN (2,3,5,8)
