@@ -110,6 +110,25 @@ Message ntext not null,
 Sendtime Datetime DEFAULT GETDATE()
 )
 
+-- master table
+CREATE TABLE Master
+(
+Master_id int not null PRIMARY KEY IDENTITY(1,1),
+Master_Value varchar(20) not null ,
+Master_SubValue varchar(20) not null
+)
+
+
+-- Insert data in master
+INSERT INTO Master VALUES
+('Visibility','Private'),
+('Visibility','Public'),
+('Gender','Male'),
+('Gender','Female'),
+('Gender','Other'),
+('Status','Online'),
+('Status','Offline')
+
 USE [socialmedia]
 GO
 -- Categories Add,Update,Delete,Display
