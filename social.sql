@@ -47,10 +47,10 @@ CREATE TABLE FriendRequest
 FriendRequestid int  CONSTRAINT FriendRequestid_Post PRIMARY KEY  IDENTITY(1,1),
 FriendRequest_Uid int  not null CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid) ,
 FriendRequest_Frid int not null CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
-CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r),
+CONSTRAINT unique_FriendRequest UNIQUE(FriendRequest_Uid,FriendRequest_Frid),
 FriendStatus bit not null,
 Requested_Date DATE  not null DEFAULT GETDATE(),
- Approved_Date DATE  null
+ Approved_Date DATE 
 )
 --add columns in FriendRequest
  ALTER TABLE FriendRequest ALTER COLUMN FriendStatus bit  not null 
