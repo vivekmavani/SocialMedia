@@ -47,8 +47,11 @@ CREATE TABLE FriendRequest
 FriendRequestid int  CONSTRAINT FriendRequestid_Post PRIMARY KEY  IDENTITY(1,1),
 FriendRequest_Uid int  not null CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid) ,
 FriendRequest_Frid int not null CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
-CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r)
+CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r),
+FriendStatus bit DEFAULT 0
 )
+--add column in FriendRequest
+ALTER TABLE dbo.FriendRequest ADD FriendStatus bit Default 0 
 
 /*CREATE TABLE FriendAccept
 (
