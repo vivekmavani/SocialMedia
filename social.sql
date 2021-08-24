@@ -353,14 +353,14 @@ DELETE FROM [dbo].[Post]
 
 
 --FRIEND ACCAPTE TABLE DATA
-INSERT INTO FriendAccept VALUES (1,3),
+/*INSERT INTO FriendAccept VALUES (1,3),
 	(2,3),
 	(2,4),
 	(1,5),
 	(2,6),
 	(5,4),
 	(1,2),
-	(3,4)
+	(3,4)*/
 
 --DISPLAY FRIEND
 
@@ -408,10 +408,10 @@ DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
 --  acceapte request
 
 
-INSERT INTO FriendAccept VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
+/*INSERT INTO FriendAccept VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
                                   (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
 DELETE FROM FriendRequest WHERE FriendRequestid = 6
-SELECT * FROM FriendAccept 
+SELECT * FROM FriendAccept */
 SELECT * FROM FriendRequest
 
 
