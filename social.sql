@@ -841,3 +841,13 @@ SET Visible = 1 WHERE Visible = 0
 
 ALTER TABLE Users
 ADD CONSTRAINT visibility_chk check(Visible IN(1,2))
+/*Updated Image table*/
+
+ALTER TABLE Image
+ALTER COLUMN Imageid INT NOT NULL
+
+Alter table Image
+DROP constraint Ipid
+
+ALTER TABLE Image
+ADD CONSTRAINT Ipid FOREIGN KEY (Imageid) REFERENCES POST(Pid) ON DELETE CASCADE ON UPDATE CASCADE
