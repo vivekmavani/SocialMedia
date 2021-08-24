@@ -67,7 +67,7 @@ msg_time datetime DEFAULT GETDATE()
 )
 
 Create Table Comment(
-Comment_Id INT PRIMARY KEY IDENTITY(1,1),
+Comment_Id INT CONSTRAINT PK_Comment_Comment_Id PRIMARY KEY IDENTITY(1,1),
 Comment_Text NVARCHAR(100),
 Uid INT not null Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
 Pid INT not null Constraint Pfk FOREIGN key REFERENCES Post(Pid)
@@ -83,7 +83,7 @@ Uid int not null CONSTRAINT Uid_Likebyusers FOREIGN KEY  REFERENCES  Users(Uid)
 -- group table
 CREATE TABLE Groups
 (
-GroupId int not null PRIMARY KEY IDENTITY(1,1),
+GroupId int CONSTRAINT PK_Groups_GroupID PRIMARY KEY IDENTITY(1,1),
 grp_name varchar(30) not null,
 grp_description varchar(100) not null,
 created_by int not null CONSTRAINT grp_lead FOREIGN KEY REFERENCES Users(Uid),
@@ -93,7 +93,7 @@ createdAt datetime default GETDATE()
 -- group members
 CREATE TABLE GroupMember
 (
-GrpMembar_id int not null PRIMARY KEY IDENTITY(1,1),
+GrpMembar_id int CONSTRAINT PK_GroupMember_GrpMembar_id PRIMARY KEY IDENTITY(1,1),
 Group_id int not null CONSTRAINT grp_member FOREIGN KEY REFERENCES Groups(GroupId) ON DELETE CASCADE ON UPDATE CASCADE,
 UserId int not null CONSTRAINT grpUid FOREIGN KEY REFERENCES Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
 date_joined date DEFAULT GETDATE(),
@@ -103,11 +103,18 @@ CONSTRAINT unqMember UNIQUE(Group_id,UserId)
 -- group message
 CREATE TABLE GroupMessage
 (
-grpMsg_id int not null PRIMARY KEY IDENTITY(1,1),
+grpMsg_id int not null CONSTRAINT PK_GroupMessage_GrpMsg_id PRIMARY KEY IDENTITY(1,1),
 grp_id int not null CONSTRAINT grpid FOREIGN KEY REFERENCES Groups(GroupId),
 UserID int not null CONSTRAINT grpMsgUid FOREIGN KEY REFERENCES Users(Uid),
 Message ntext not null,
 Sendtime Datetime DEFAULT GETDATE()
+)
+
+--Tags Table
+CREATE TABLE Tags(
+	Tag_ID INT CONSTRAINT PK_Tag_ID PRIMARY KEY IDENTITY(1,1),
+	Tags_Pid INT NOT NULL CONSTRAINT FK_Tags_Post_Tags_Pid FOREIGN KEY REFERENCES Post(Pid),
+	Tags_Uid INT NOT NULL CONSTRAINT FK_Tags_Users_Tags_Uid FOREIGN KEY REFERENCES Users(Uid)
 )
 
 USE [socialmedia]
