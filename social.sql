@@ -9,7 +9,6 @@ State VARCHAR(20) not null,
 Country VARCHAR(20) not null,
 )
 
-
 CREATE TABLE Users
 (
 Uid int  CONSTRAINT uid_User PRIMARY KEY  IDENTITY(1,1),
@@ -266,11 +265,11 @@ INSERT INTO Chat VALUES
 
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
+((SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2) ,(SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4),'hi','2021-08-19 16:21:22.713')
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
-((SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
+((SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2) ,(SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4),'how are you','2021-08-19 16:22:22.713'),
+((SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4) ,(SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2),'I am fine','2021-08-19 17:22:22.713')
 
 DECLARE @Sender int
 SET @Sender = 2
@@ -352,14 +351,14 @@ DELETE FROM [dbo].[Post]
 
 
 --FRIEND ACCAPTE TABLE DATA
-INSERT INTO FriendAccept VALUES (1,3),
+/*INSERT INTO FriendAccept VALUES (1,3),
 	(2,3),
 	(2,4),
 	(1,5),
 	(2,6),
 	(5,4),
 	(1,2),
-	(3,4)
+	(3,4)*/
 
 --DISPLAY FRIEND
 
@@ -407,10 +406,10 @@ DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
 --  acceapte request
 
 
-INSERT INTO FriendAccept VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
+/*INSERT INTO FriendAccept VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
                                   (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
 DELETE FROM FriendRequest WHERE FriendRequestid = 6
-SELECT * FROM FriendAccept 
+SELECT * FROM FriendAccept */
 SELECT * FROM FriendRequest
 
 
@@ -439,11 +438,11 @@ WHERE u.Name = 'Prit'
 
 SELECT u.Name FROM Users u WHERE u.Uid IN 
 (
-SELECT fa.Frid FROM FriendAccept fa
-WHERE fa.Uid = 2
+SELECT fa.Frid_r FROM FriendRequest fa
+WHERE fa.Uid_s = 2
 INTERSECT
-SELECT fa.Frid FROM FriendAccept fa
-WHERE fa.Uid = 5
+SELECT fa.Frid_r FROM FriendRequest fa
+WHERE fa.Uid_s = 5
 )
 
 
@@ -457,10 +456,10 @@ SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
 
 
 -- List of friends
-SELECT f.Frid,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid) as 'friend_name' FROM FriendAccept f
-	JOIN Users u ON u.Uid = f.Uid 
-WHERE u.Name = 'Hiren'
-ORDER BY f.Frid
+SELECT f.Frid_r,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid_r) as 'friend_name' FROM FriendRequest f
+	JOIN Users u ON u.Uid = f.Uid_s 
+WHERE u.Name = 'Prit'
+ORDER BY f.Frid_r
 
 
 
@@ -480,28 +479,30 @@ GROUP BY Uid
 
 -- List of users with 0 friends
 SELECT Uid FROM Users 
-WHERE Uid NOT IN (SELECT Uid FROM FriendAccept)
+WHERE Uid NOT IN (SELECT Uid_s FROM FriendRequest UNION SELECT Frid_r FROM FriendRequest)
 
 
 
 -- Users with total friends
 SELECT u.Uid,
 		u.Name,
-		(SELECT COUNT(f.Frid) FROM FriendAccept f WHERE f.Uid = u.Uid GROUP BY f.Uid) as 'No of friends'
+		(SELECT COUNT(f.Frid_r) FROM FriendRequest f WHERE f.Uid_s = u.Uid GROUP BY f.Uid_s) as 'No of friends'
 FROM Users u
 
 -- friend suggestions 
-SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid  
-IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  
-IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) 
+SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT FriendRequest_Uid FROM 
+FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Frid  
+IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus  =1)) OR Uid 
+IN (Select DISTINCT FriendRequest_Frid FROM  FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Uid  
+IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus =1)) 
 
 
 
 /*1. Write a query to display all details of private account */
 
-select * from Users where Visible = 0;
+select * from Users where Visible = 1;
 
-/*2. Write query to display total account from city */
+/*2. Write query to display total account from perticular city */
 
 select count(uid) "Account",City 
 from Users 
@@ -533,13 +534,14 @@ where Users.Name = 'Neel'
 
 /*6. write a query to display friend name of user Romish*/
 
-select u.name from Users "u" where u.Uid IN 
-(select fa.frid from FriendAccept "fa" where fa.uid = 
-(select uid from Users where name = 'Romish')) 
+Select name from Users where Uid IN
+(Select Frid_r from FriendRequest where FriendStatus = 1 AND Uid_s = 
+(Select uid from users where name = 'Romish'))
 OR
-u.Uid IN 
-(select fa.uid from FriendAccept "fa" where fa.Frid = 
-(select uid from Users where name = 'Romish'))
+Uid IN
+(Select Uid_s from FriendRequest where FriendStatus = 1 AND Frid_r = 
+(Select uid from users where name = 'Romish'))
+
 
 /*7. write a query to display all the message send by prit*/
 
@@ -641,7 +643,7 @@ WHERE u.Uid IN
 ----- Like ------
 
 --TODAY'S Tranding post like vias
-SELECT Pid,Title,Likes,dateofpost FROM Post  WHERE dateofpost = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
+SELECT Pid,Title,Likes,Post_Date FROM Post  WHERE Post_Date = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
 
 Select * FROM Likebyuser
 
@@ -654,27 +656,31 @@ UPDATE Post SET Likes = Likes + 1 WHERE Pid = 4
 INSERT INTO Likebyuser VALUES(4,2) 
 -- delete dislike by user
 UPDATE Post SET Likes = Likes - 1 WHERE Pid = 4 AND Likes  <>0
-DELETE Likebyuser WHERE Pid = 4 AND Uid = 1
+DELETE Likebyuser WHERE LikebyUser_Pid = 4 AND LikebyUser_Uid = 1
 
 --display post like by user
-SELECT * FROM Post WHERE Pid IN(SELECT Pid FROM Likebyuser WHERE Uid = 1)
+SELECT * FROM Post WHERE Pid IN(SELECT LikebyUser_Pid FROM Likebyuser WHERE LikebyUser_Uid = 1)
 
 -- who likes the post 
-SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.Uid WHERE Pid = 3
+SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.LikebyUser_Uid WHERE LikebyUser_Pid = 3
 
 
  
 -- display post by your friends likes
-   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid
-   FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE b.Category_ID
-   IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
+   SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a.Post_Uid
+   FROM Post a JOIN Categories b ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
+   WHERE b.Category_ID IN (SELECT a.Post_Category_ID FROM POST a JOIN
+   Likebyuser b ON a.Pid = b.LikebyUser_Pid WHERE b.LikebyUser_Uid = 2)
 
 --  display recommended post like by your friend 
-SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid FROM Post a JOIN Categories b
-ON a.Category_ID = b.Category_ID WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE Uid IN (SELECT Uid FROM  Users WHERE
-Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid = 5)
-OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  = 5))) 
+SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a.Post_Uid FROM Post a JOIN Categories b
+ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
+WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE LikebyUser_Uid IN (SELECT Uid FROM  Users WHERE
+Uid  IN (Select DISTINCT Uid FROM  FriendRequest WHERE FriendRequest_Frid = 5  AND FriendStatus = 1)
+OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM  FriendRequest WHERE FriendRequest_Uid  = 5 AND FriendStatus = 1))) 
 --
+--  acceapt request
+UPDATE FriendRequest SET FriendStatus = 1, Approved_Date = GETDATE() WHERE FriendRequest_Uid = 1 AND FriendRequest_Frid = 5
 
 INSERT INTO Groups VALUES
 ('grp1','this is our college group',2,'2021-01-01'),
@@ -805,3 +811,50 @@ DROP column Image
 
 ALTER TABLE Image
 ADD CONSTRAINT Ipid FOREIGN KEY (Imageid) REFERENCES POST(Pid)
+
+
+
+
+ALTER TABLE Users
+DROP CONSTRAINT employees_Gender
+
+UPDATE Users
+SET Gender = 3 WHERE Gender = 'M'
+
+
+UPDATE Users
+SET Gender = 4 WHERE Gender = 'F'
+
+
+UPDATE Users
+SET Gender = 5 WHERE Gender = 'O'
+
+ALTER TABLE Users
+ADD CONSTRAINT gender_ckh check(Gender IN(3,4,5)) 
+
+
+ALTER TABLE Users
+DROP CONSTRAINT employees_date
+
+
+UPDATE Users
+SET Visible = 2 WHERE Visible = 1
+
+UPDATE Users
+SET Visible = 1 WHERE Visible = 0
+
+
+ALTER TABLE Users
+ADD CONSTRAINT visibility_chk check(Visible IN(1,2))
+/*Updated Image table*/
+
+ALTER TABLE Image
+ALTER COLUMN Imageid INT NOT NULL
+
+Alter table Image
+DROP constraint Ipid
+
+ALTER TABLE Image
+ADD CONSTRAINT Ipid FOREIGN KEY (Imageid) REFERENCES POST(Pid) ON DELETE CASCADE ON UPDATE CASCADE
+
+
