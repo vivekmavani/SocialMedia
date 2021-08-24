@@ -762,3 +762,28 @@ SET Status = 6 WHERE Uid IN (2,3,5,8)
 
 UPDATE Users
 SET Status = 7 WHERE Uid IN (4,6,7,9)
+
+/*Added Image Table in database*/
+Create table Image
+( Imageid int,
+  Image nvarchar(MAX) not null CONSTRAINT img CHECK(Image LIKE('%.png')) );
+
+  INSERT INTO Image
+  Values
+  (1,'img_01.png'),
+  (1,'img_02.png'),
+  (2,'img_03.png'),
+  (2,'img_04.png'),
+  (2,'img_05.png'),
+  (2,'img_06.png'),
+  (3,'img_07.png'),
+  (4,'img_08.png'),
+  (4,'img_09.png'),
+  (5,'img_11.png'),
+  (6,'img_12.png'),
+  (7,'img_13.png'),
+  (8,'img_14.png'),
+  (8,'img_15.png'),
+  (8,'img_16.png'),
+  (9,'img_17.png'),
+  (9,'img_18.png')
