@@ -500,9 +500,9 @@ IN(SELECT Frid FROM FriendAccept WHERE Uid  =1))
 
 /*1. Write a query to display all details of private account */
 
-select * from Users where Visible = 0;
+select * from Users where Visible = 1;
 
-/*2. Write query to display total account from city */
+/*2. Write query to display total account from perticular city */
 
 select count(uid) "Account",City 
 from Users 
@@ -534,13 +534,14 @@ where Users.Name = 'Neel'
 
 /*6. write a query to display friend name of user Romish*/
 
-select u.name from Users "u" where u.Uid IN 
-(select fa.frid from FriendAccept "fa" where fa.uid = 
-(select uid from Users where name = 'Romish')) 
+Select name from Users where Uid IN
+(Select Frid_r from FriendRequest where FriendStatus = 1 AND Uid_s = 
+(Select uid from users where name = 'Romish'))
 OR
-u.Uid IN 
-(select fa.uid from FriendAccept "fa" where fa.Frid = 
-(select uid from Users where name = 'Romish'))
+Uid IN
+(Select Uid_s from FriendRequest where FriendStatus = 1 AND Frid_r = 
+(Select uid from users where name = 'Romish'))
+
 
 /*7. write a query to display all the message send by prit*/
 
