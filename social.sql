@@ -807,6 +807,40 @@ DROP column Image
 ALTER TABLE Image
 ADD CONSTRAINT Ipid FOREIGN KEY (Imageid) REFERENCES POST(Pid)
 
+
+
+
+ALTER TABLE Users
+DROP CONSTRAINT employees_Gender
+
+UPDATE Users
+SET Gender = 3 WHERE Gender = 'M'
+
+
+UPDATE Users
+SET Gender = 4 WHERE Gender = 'F'
+
+
+UPDATE Users
+SET Gender = 5 WHERE Gender = 'O'
+
+ALTER TABLE Users
+ADD CONSTRAINT gender_ckh check(Gender IN(3,4,5)) 
+
+
+ALTER TABLE Users
+DROP CONSTRAINT employees_date
+
+
+UPDATE Users
+SET Visible = 2 WHERE Visible = 1
+
+UPDATE Users
+SET Visible = 1 WHERE Visible = 0
+
+
+ALTER TABLE Users
+ADD CONSTRAINT visibility_chk check(Visible IN(1,2))
 /*Updated Image table*/
 
 ALTER TABLE Image
