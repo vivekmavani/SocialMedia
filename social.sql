@@ -734,3 +734,19 @@ WHERE rank = 1
 
 -- location
 SELECT * FROM dbo.Location
+
+
+
+-- added data for user status column
+ALTER TABLE Users
+ADD Status int CONSTRAINT chk_status FOREIGN KEY REFERENCES Master(Master_id)
+
+UPDATE Users
+SET Status = 6 WHERE Uid = 1
+
+
+UPDATE Users
+SET Status = 6 WHERE Uid IN (2,3,5,8)
+
+UPDATE Users
+SET Status = 7 WHERE Uid IN (4,6,7,9)
