@@ -49,13 +49,13 @@ FriendRequest_Uid int  not null CONSTRAINT Uid_s_FriendRequest FOREIGN KEY  REFE
 FriendRequest_Frid int not null CONSTRAINT Frid_r_FriendRequest FOREIGN KEY  REFERENCES  Users(Uid),
 CONSTRAINT unique_FriendRequest UNIQUE(Uid_s,Frid_r),
 FriendStatus bit not null,
-Requested_date DATE  not null DEFAULT GETDATE(),
- Approved_date DATE  null
+Requested_Date DATE  not null DEFAULT GETDATE(),
+ Approved_Date DATE  null
 )
 --add columns in FriendRequest
  ALTER TABLE FriendRequest ALTER COLUMN FriendStatus bit  not null 
- ALTER TABLE FriendRequest ADD  Requested_date DATE  not null DEFAULT GETDATE()
- ALTER TABLE FriendRequest ADD  Approved_date DATE  null
+ ALTER TABLE FriendRequest ADD  Requested_Date DATE  not null DEFAULT GETDATE()
+ ALTER TABLE FriendRequest ADD  Approved_Date DATE  null
 /*CREATE TABLE FriendAccept
 (
 FriendAccapteid int   CONSTRAINT FriendAccapteid_FriendAccapte PRIMARY KEY  IDENTITY(1,1),
