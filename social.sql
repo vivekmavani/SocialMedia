@@ -795,3 +795,14 @@ Create table Image
   (8,'img_16.png'),
   (9,'img_17.png'),
   (9,'img_18.png')
+
+  /*Deleted image column from post and updated image table*/
+
+Alter table post
+DROP constraint post_Image
+
+Alter table post
+DROP column Image
+
+ALTER TABLE Image
+ADD CONSTRAINT Ipid FOREIGN KEY (Imageid) REFERENCES POST(Pid)
