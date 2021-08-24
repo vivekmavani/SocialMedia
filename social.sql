@@ -34,7 +34,6 @@ CREATE TABLE Post
 Pid int  not null CONSTRAINT pid_Post PRIMARY KEY  IDENTITY(1,1),
 Title nvarchar(20) not null,
 Description ntext not null,
-Image nvarchar(MAX) not null CONSTRAINT Post_Image CHECK(Image LIKE('%.png')),
 Likes int DEFAULT 0,
 Post_Category_ID smallint not null CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
 Post_Uid int not null CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -491,17 +490,19 @@ SELECT u.Uid,
 FROM Users u
 
 -- friend suggestions 
-SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid  
-IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  
-IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) 
+SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT FriendRequest_Uid FROM 
+FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Frid  
+IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus  =1)) OR Uid 
+IN (Select DISTINCT FriendRequest_Frid FROM  FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Uid  
+IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus =1)) 
 
 
 
 /*1. Write a query to display all details of private account */
 
-select * from Users where Visible = 0;
+select * from Users where Visible = 1;
 
-/*2. Write query to display total account from city */
+/*2. Write query to display total account from perticular city */
 
 select count(uid) "Account",City 
 from Users 
@@ -533,13 +534,14 @@ where Users.Name = 'Neel'
 
 /*6. write a query to display friend name of user Romish*/
 
-select u.name from Users "u" where u.Uid IN 
-(select fa.frid from FriendAccept "fa" where fa.uid = 
-(select uid from Users where name = 'Romish')) 
+Select name from Users where Uid IN
+(Select Frid_r from FriendRequest where FriendStatus = 1 AND Uid_s = 
+(Select uid from users where name = 'Romish'))
 OR
-u.Uid IN 
-(select fa.uid from FriendAccept "fa" where fa.Frid = 
-(select uid from Users where name = 'Romish'))
+Uid IN
+(Select Uid_s from FriendRequest where FriendStatus = 1 AND Frid_r = 
+(Select uid from users where name = 'Romish'))
+
 
 /*7. write a query to display all the message send by prit*/
 
@@ -642,7 +644,7 @@ WHERE u.Uid IN
 ----- Like ------
 
 --TODAY'S Tranding post like vias
-SELECT Pid,Title,Likes,dateofpost FROM Post  WHERE dateofpost = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
+SELECT Pid,Title,Likes,Post_Date FROM Post  WHERE Post_Date = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
 
 Select * FROM Likebyuser
 
@@ -655,27 +657,31 @@ UPDATE Post SET Likes = Likes + 1 WHERE Pid = 4
 INSERT INTO Likebyuser VALUES(4,2) 
 -- delete dislike by user
 UPDATE Post SET Likes = Likes - 1 WHERE Pid = 4 AND Likes  <>0
-DELETE Likebyuser WHERE Pid = 4 AND Uid = 1
+DELETE Likebyuser WHERE LikebyUser_Pid = 4 AND LikebyUser_Uid = 1
 
 --display post like by user
-SELECT * FROM Post WHERE Pid IN(SELECT Pid FROM Likebyuser WHERE Uid = 1)
+SELECT * FROM Post WHERE Pid IN(SELECT LikebyUser_Pid FROM Likebyuser WHERE LikebyUser_Uid = 1)
 
 -- who likes the post 
-SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.Uid WHERE Pid = 3
+SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.LikebyUser_Uid WHERE LikebyUser_Pid = 3
 
 
  
 -- display post by your friends likes
-   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid
-   FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE b.Category_ID
-   IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
+   SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a.Post_Uid
+   FROM Post a JOIN Categories b ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
+   WHERE b.Category_ID IN (SELECT a.Post_Category_ID FROM POST a JOIN
+   Likebyuser b ON a.Pid = b.LikebyUser_Pid WHERE b.LikebyUser_Uid = 2)
 
 --  display recommended post like by your friend 
-SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid FROM Post a JOIN Categories b
-ON a.Category_ID = b.Category_ID WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE Uid IN (SELECT Uid FROM  Users WHERE
-Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid = 5)
-OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  = 5))) 
+SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a.Post_Uid FROM Post a JOIN Categories b
+ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
+WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE LikebyUser_Uid IN (SELECT Uid FROM  Users WHERE
+Uid  IN (Select DISTINCT Uid FROM  FriendRequest WHERE FriendRequest_Frid = 5  AND FriendStatus = 1)
+OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM  FriendRequest WHERE FriendRequest_Uid  = 5 AND FriendStatus = 1))) 
 --
+--  acceapt request
+UPDATE FriendRequest SET FriendStatus = 1, Approved_Date = GETDATE() WHERE FriendRequest_Uid = 1 AND FriendRequest_Frid = 5
 
 INSERT INTO Groups VALUES
 ('grp1','this is our college group',2,'2021-01-01'),
@@ -697,15 +703,15 @@ INSERT INTO GroupMember VALUES
 (5,(SELECT uid FROM Users WHERE Uid = 5),'2021-08-06'),
 (5,(SELECT uid FROM Users WHERE Uid = 2),'2021-08-05')
 
-INSERT INTO GroupMessage(grp_id,userId,Message) VALUES
-(1,(SELECT UserId FROM GroupMember WHERE Group_id = 1 AND UserId = 2 ),'hello every one'),
-(1,(SELECT UserId FROM GroupMember WHERE Group_id = 1 AND UserId = 3 ),'hi how are you'),
-(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 3 ),'hello'),
-(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 5 ),'good morning'),
-(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 6 ),'good evening'),
-(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 4 ),'happy journey'),
-(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'take care'),
-(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'Good night')
+INSERT INTO GroupMessage([GroupMessage_Groupid],GroupMessage_Uid,Message) VALUES
+(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 2 ),'hello every one'),
+(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 3 ),'hi how are you'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 3 ),'hello'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 5 ),'good morning'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 6 ),'good evening'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 4 ),'happy journey'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'take care'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'Good night')
 
 
 
