@@ -382,14 +382,12 @@ WHERE C.Category_Name = 'Album'
 
 
 -- send friend request 
-INSERT INTO FriendRequest VALUES (1,3),
-	(2,3),
-	(2,4),
-	(1,5),
-	(2,6),
-	(5,4),
-	(1,2),
-	(3,4)
+INSERT INTO FriendRequest VALUES 
+	(1,5,0),
+	(2,6,0),
+	(5,4,0),
+	(1,2,0),
+	(3,4,0)
 
 GO
 SELECT * FROM [FriendRequest]
