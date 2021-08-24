@@ -9,7 +9,6 @@ State VARCHAR(20) not null,
 Country VARCHAR(20) not null,
 )
 
-
 CREATE TABLE Users
 (
 Uid int  CONSTRAINT uid_User PRIMARY KEY  IDENTITY(1,1),
@@ -267,11 +266,11 @@ INSERT INTO Chat VALUES
 
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'hi','2021-08-19 16:21:22.713')
+((SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2) ,(SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4),'hi','2021-08-19 16:21:22.713')
 
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2) ,(SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4),'how are you','2021-08-19 16:22:22.713'),
-((SELECT DISTINCT Frid FROM FriendAccept WHERE Frid = 4) ,(SELECT DISTINCT Uid FROM FriendAccept WHERE Uid = 2),'I am fine','2021-08-19 17:22:22.713')
+((SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2) ,(SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4),'how are you','2021-08-19 16:22:22.713'),
+((SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4) ,(SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2),'I am fine','2021-08-19 17:22:22.713')
 
 DECLARE @Sender int
 SET @Sender = 2
@@ -440,11 +439,11 @@ WHERE u.Name = 'Prit'
 
 SELECT u.Name FROM Users u WHERE u.Uid IN 
 (
-SELECT fa.Frid FROM FriendAccept fa
-WHERE fa.Uid = 2
+SELECT fa.Frid_r FROM FriendRequest fa
+WHERE fa.Uid_s = 2
 INTERSECT
-SELECT fa.Frid FROM FriendAccept fa
-WHERE fa.Uid = 5
+SELECT fa.Frid_r FROM FriendRequest fa
+WHERE fa.Uid_s = 5
 )
 
 
@@ -458,10 +457,10 @@ SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
 
 
 -- List of friends
-SELECT f.Frid,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid) as 'friend_name' FROM FriendAccept f
-	JOIN Users u ON u.Uid = f.Uid 
-WHERE u.Name = 'Hiren'
-ORDER BY f.Frid
+SELECT f.Frid_r,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid_r) as 'friend_name' FROM FriendRequest f
+	JOIN Users u ON u.Uid = f.Uid_s 
+WHERE u.Name = 'Prit'
+ORDER BY f.Frid_r
 
 
 
@@ -481,14 +480,14 @@ GROUP BY Uid
 
 -- List of users with 0 friends
 SELECT Uid FROM Users 
-WHERE Uid NOT IN (SELECT Uid FROM FriendAccept)
+WHERE Uid NOT IN (SELECT Uid_s FROM FriendRequest UNION SELECT Frid_r FROM FriendRequest)
 
 
 
 -- Users with total friends
 SELECT u.Uid,
 		u.Name,
-		(SELECT COUNT(f.Frid) FROM FriendAccept f WHERE f.Uid = u.Uid GROUP BY f.Uid) as 'No of friends'
+		(SELECT COUNT(f.Frid_r) FROM FriendRequest f WHERE f.Uid_s = u.Uid GROUP BY f.Uid_s) as 'No of friends'
 FROM Users u
 
 -- friend suggestions 
@@ -852,3 +851,5 @@ DROP constraint Ipid
 
 ALTER TABLE Image
 ADD CONSTRAINT Ipid FOREIGN KEY (Imageid) REFERENCES POST(Pid) ON DELETE CASCADE ON UPDATE CASCADE
+
+
