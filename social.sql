@@ -35,7 +35,6 @@ CREATE TABLE Post
 Pid int  not null CONSTRAINT pid_Post PRIMARY KEY  IDENTITY(1,1),
 Title nvarchar(20) not null,
 Description ntext not null,
-Image nvarchar(MAX) not null CONSTRAINT Post_Image CHECK(Image LIKE('%.png')),
 Likes int DEFAULT 0,
 Post_Category_ID smallint not null CONSTRAINT Category_ID_Post FOREIGN KEY  REFERENCES  Categories(Category_ID) ON DELETE CASCADE ON UPDATE CASCADE,
 Post_Uid int not null CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -697,15 +696,15 @@ INSERT INTO GroupMember VALUES
 (5,(SELECT uid FROM Users WHERE Uid = 5),'2021-08-06'),
 (5,(SELECT uid FROM Users WHERE Uid = 2),'2021-08-05')
 
-INSERT INTO GroupMessage(grp_id,userId,Message) VALUES
-(1,(SELECT UserId FROM GroupMember WHERE Group_id = 1 AND UserId = 2 ),'hello every one'),
-(1,(SELECT UserId FROM GroupMember WHERE Group_id = 1 AND UserId = 3 ),'hi how are you'),
-(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 3 ),'hello'),
-(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 5 ),'good morning'),
-(2,(SELECT UserId FROM GroupMember WHERE Group_id = 2 AND UserId = 6 ),'good evening'),
-(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 4 ),'happy journey'),
-(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'take care'),
-(5,(SELECT UserId FROM GroupMember WHERE Group_id = 5 AND UserId = 5 ),'Good night')
+INSERT INTO GroupMessage([GroupMessage_Groupid],GroupMessage_Uid,Message) VALUES
+(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 2 ),'hello every one'),
+(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 3 ),'hi how are you'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 3 ),'hello'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 5 ),'good morning'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 6 ),'good evening'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 4 ),'happy journey'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'take care'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'Good night')
 
 
 
