@@ -622,11 +622,12 @@ GROUP BY u.Name
 ORDER BY max_like DESC
 
 
--- List of users commented on Prit's post
+-- List of users commented on Neel's post
 
 SELECT c.Uid,u.Name FROM Comment c
 	JOIN Users u ON u.Uid = c.Uid
-WHERE c.Pid = (SELECT Uid FROM Users WHERE Name = 'prit')
+WHERE c.Pid IN (SELECT p.Pid FROM Post p WHERE p.Uid = (SELECT Uid FROM Users WHERE Name = 'Neel'))
+
 
 
 
