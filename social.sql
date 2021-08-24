@@ -120,6 +120,9 @@ CREATE TABLE Tags(
 	Tags_Uid INT NOT NULL CONSTRAINT FK_Tags_Users_Tags_Uid FOREIGN KEY REFERENCES Users(Uid)
 )
 
+ALTER TABLE Tags
+ADD CONSTRAINT UNIQUE_Tags UNIQUE(Tags_Pid,Tags_Uid)
+
 -- Master table
 CREATE TABLE Master
 (
