@@ -142,6 +142,10 @@ INSERT INTO Master VALUES
 ('Status','Online'),
 ('Status','Offline')
 
+--Insert data in Tags
+INSERT INTO Tags VALUES 
+	(1,2),(2,1),(2,5),(2,4),(3,5),(4,3)
+
 USE [socialmedia]
 GO
 -- Categories Add,Update,Delete,Display
