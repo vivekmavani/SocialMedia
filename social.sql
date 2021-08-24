@@ -123,6 +123,9 @@ CREATE TABLE Tags(
 	Tags_Uid INT NOT NULL CONSTRAINT FK_Tags_Users_Tags_Uid FOREIGN KEY REFERENCES Users(Uid)
 )
 
+ALTER TABLE Tags
+ADD CONSTRAINT UNIQUE_Tags UNIQUE(Tags_Pid,Tags_Uid)
+
 -- Master table
 CREATE TABLE Master
 (
@@ -141,6 +144,10 @@ INSERT INTO Master VALUES
 ('Gender','Other'),
 ('Status','Online'),
 ('Status','Offline')
+
+--Insert data in Tags
+INSERT INTO Tags VALUES 
+	(1,2),(2,1),(2,5),(2,4),(3,5),(4,3)
 
 USE [socialmedia]
 GO
