@@ -491,9 +491,11 @@ SELECT u.Uid,
 FROM Users u
 
 -- friend suggestions 
-SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid  
-IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) OR Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  
-IN(SELECT Frid FROM FriendAccept WHERE Uid  =1)) 
+SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT FriendRequest_Uid FROM 
+FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Frid  
+IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus  =1)) OR Uid 
+IN (Select DISTINCT FriendRequest_Frid FROM  FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Uid  
+IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus =1)) 
 
 
 
@@ -642,7 +644,7 @@ WHERE u.Uid IN
 ----- Like ------
 
 --TODAY'S Tranding post like vias
-SELECT Pid,Title,Likes,dateofpost FROM Post  WHERE dateofpost = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
+SELECT Pid,Title,Likes,Post_Date FROM Post  WHERE Post_Date = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
 
 Select * FROM Likebyuser
 
@@ -655,27 +657,31 @@ UPDATE Post SET Likes = Likes + 1 WHERE Pid = 4
 INSERT INTO Likebyuser VALUES(4,2) 
 -- delete dislike by user
 UPDATE Post SET Likes = Likes - 1 WHERE Pid = 4 AND Likes  <>0
-DELETE Likebyuser WHERE Pid = 4 AND Uid = 1
+DELETE Likebyuser WHERE LikebyUser_Pid = 4 AND LikebyUser_Uid = 1
 
 --display post like by user
-SELECT * FROM Post WHERE Pid IN(SELECT Pid FROM Likebyuser WHERE Uid = 1)
+SELECT * FROM Post WHERE Pid IN(SELECT LikebyUser_Pid FROM Likebyuser WHERE LikebyUser_Uid = 1)
 
 -- who likes the post 
-SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.Uid WHERE Pid = 3
+SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.LikebyUser_Uid WHERE LikebyUser_Pid = 3
 
 
  
 -- display post by your friends likes
-   SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid
-   FROM Post a JOIN Categories b ON a.Category_ID = b.Category_ID WHERE b.Category_ID
-   IN (SELECT a.Category_ID FROM POST a JOIN Likebyuser b ON a.Pid = b.Pid WHERE b.Uid = 1)
+   SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a.Post_Uid
+   FROM Post a JOIN Categories b ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
+   WHERE b.Category_ID IN (SELECT a.Post_Category_ID FROM POST a JOIN
+   Likebyuser b ON a.Pid = b.LikebyUser_Pid WHERE b.LikebyUser_Uid = 2)
 
 --  display recommended post like by your friend 
-SELECT a.Pid,a.Title,a.Description,a.Image,a.Likes,b.Category_Name,a.Post_Date,a.Uid FROM Post a JOIN Categories b
-ON a.Category_ID = b.Category_ID WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE Uid IN (SELECT Uid FROM  Users WHERE
-Uid  IN (Select DISTINCT Uid FROM  FriendAccept WHERE Frid = 5)
-OR  Uid  IN (Select DISTINCT Frid FROM  FriendAccept WHERE Uid  = 5))) 
+SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a.Post_Uid FROM Post a JOIN Categories b
+ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
+WHERE a.Pid IN(SELECT Pid FROM Likebyuser WHERE LikebyUser_Uid IN (SELECT Uid FROM  Users WHERE
+Uid  IN (Select DISTINCT Uid FROM  FriendRequest WHERE FriendRequest_Frid = 5  AND FriendStatus = 1)
+OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM  FriendRequest WHERE FriendRequest_Uid  = 5 AND FriendStatus = 1))) 
 --
+--  acceapt request
+UPDATE FriendRequest SET FriendStatus = 1, Approved_Date = GETDATE() WHERE FriendRequest_Uid = 1 AND FriendRequest_Frid = 5
 
 INSERT INTO Groups VALUES
 ('grp1','this is our college group',2,'2021-01-01'),
