@@ -273,13 +273,14 @@ INSERT INTO Chat VALUES
 ((SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2) ,(SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4),'how are you','2021-08-19 16:22:22.713'),
 ((SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4) ,(SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2),'I am fine','2021-08-19 17:22:22.713')
 
+
 DECLARE @Sender int
-SET @Sender = 2
+SET @Sender = 1
 
 DECLARE @Receiver int
-SET @Receiver = 4
+SET @Receiver = 2
 
-SELECT 
+SELECT
 	(SELECT u.Name FROM Users u WHERE u.Uid = c.Sender) as 'Sender', 
 	(SELECT u.Name FROM Users u WHERE u.Uid = c.Receiver) as 'Receiver', 
 	c.Msg
@@ -437,18 +438,25 @@ SELECT * FROM Users
 SELECT c.Category_Name FROM Categories c
 	INNER JOIN Post p ON p.Post_Category_ID = c.Category_ID
 	INNER JOIN Users u ON u.Uid = p.Post_Uid
-WHERE u.Name = 'Prit'
-
+WHERE u.Name = 'Vivek'
 
 -- Display mutual friends
 
-  SELECT u.Name FROM Users u WHERE u.Uid IN 
+SELECT u.Name FROM Users u WHERE u.Uid IN 
 (
-SELECT fa.FriendRequest_Frid FROM FriendRequest fa
+(SELECT fa.FriendRequest_Frid FROM FriendRequest fa
 WHERE fa.FriendRequest_Uid = 2
+UNION
+SELECT fa.FriendRequest_Uid FROM FriendRequest fa
+WHERE fa.FriendRequest_Frid = 2)
+
 INTERSECT
-SELECT fa.FriendRequest_Frid FROM FriendRequest fa
+
+(SELECT fa.FriendRequest_Frid FROM FriendRequest fa
 WHERE fa.FriendRequest_Uid = 5
+UNION
+SELECT fa.FriendRequest_Uid FROM FriendRequest fa
+WHERE fa.FriendRequest_Frid = 5)
 )
 
 -- All users with its category name of Post
@@ -470,13 +478,14 @@ WHERE FriendStatus = 1
 
 -- List of users who have not posted anything
 SELECT Name,Uid FROM Users
-WHERE uid NOT IN (SELECT Post_Uid FROM Post)
+WHERE uid NOT IN (SELECT Post_uid FROM Post)
 
 
 -- Number of Post of all users
 
-SELECT COUNT(Pid) as 'no. of post',Post_Uid,
-(SELECT Name FROM Users WHERE Uid = Post.Post_Uid) as 'Name' 
+SELECT COUNT(Pid) as 'no. of post',
+		Post_Uid,
+		(SELECT Name FROM Users WHERE Uid = Post.Post_Uid) as 'Name' 
 FROM Post 
 GROUP BY Post_Uid
 
@@ -484,28 +493,28 @@ GROUP BY Post_Uid
 -- List of users with 0 friends
 
 SELECT Uid FROM Users 
-WHERE Uid NOT IN (SELECT FriendRequest_Frid FROM FriendRequest UNION SELECT FriendRequest_Frid FROM FriendRequest)
+WHERE Uid NOT IN (SELECT FriendRequest_Uid FROM FriendRequest UNION SELECT FriendRequest_Frid FROM FriendRequest)
 
 -- Users with total friends
-SELECT Uid_s as 'userID',COUNT(FriendRequest_Frid) FROM 
-(SELECT f.Uid_s,f.Frid_r,f.FriendStatus as 'fs' FROM FriendRequest f) temp
+SELECT FriendRequest_Uid as 'userID',COUNT(FriendRequest_Frid) FROM 
+(SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus as 'fs' FROM FriendRequest f) temp
 WHERE fs = 1
-GROUP BY Uid_s
+GROUP BY FriendRequest_Uid
 UNION
-SELECT Frid_r as 'UserID',COUNT(Uid_s) FROM 
-(SELECT f.Uid_s,f.Frid_r,f.FriendStatus as 'fs' FROM FriendRequest f) temp
+SELECT FriendRequest_Frid as 'UserID',COUNT(FriendRequest_Uid) FROM 
+(SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus as 'fs' FROM FriendRequest f) temp
 WHERE fs = 1
-GROUP BY Frid_r
+GROUP BY FriendRequest_Frid
 
 
 -- OR 
-SELECT Uid_s as 'userID',COUNT(Frid_r) FROM  FriendRequest
+SELECT FriendRequest_Uid as 'userID',COUNT(FriendRequest_Frid) FROM  FriendRequest
 WHERE friendstatus = 1
-GROUP BY Uid_s
+GROUP BY FriendRequest_Uid
 UNION
-SELECT Frid_r as 'userID',COUNT(Uid_s) FROM  FriendRequest
+SELECT FriendRequest_Frid as 'userID',COUNT(FriendRequest_Uid) FROM  FriendRequest
 WHERE friendstatus = 1
-GROUP BY Frid_r
+GROUP BY FriendRequest_Frid
 
 
 -- friend suggestions 
@@ -625,7 +634,7 @@ select * from Comment
 
 
 --highest post in categories
-SELECT DENSE_RANK() OVER(ORDER BY COUNT(P.PID) DESC),C.Category_Name,COUNT(P.Pid) FROM Categories C  JOIN Post P ON C.Category_ID = P.Category_ID
+SELECT DENSE_RANK() OVER(ORDER BY COUNT(P.PID) DESC) as 'rank',C.Category_Name,COUNT(P.Pid) FROM Categories C  JOIN Post P ON C.Category_ID = P.Post_Category_ID
 GROUP BY Category_Name
 
 -- add dob in users
@@ -636,8 +645,8 @@ ALTER TABLE Users ADD dateofbirth DATE
 
 
 SELECT TOP 1 u.name as 'name',MAX(p.Likes) as 'max_like' FROM Users u
-	JOIN Post p ON p.Uid = u.Uid
-	JOIN Categories c ON c.Category_ID = p.Category_ID
+	JOIN Post p ON p.Post_Uid = u.Uid
+	JOIN Categories c ON c.Category_ID = p.Post_Category_ID
 WHERE c.Category_Name LIKE 'A%'
 GROUP BY u.Name
 ORDER BY max_like DESC
@@ -645,9 +654,9 @@ ORDER BY max_like DESC
 
 -- List of users commented on Neel's post
 
-SELECT c.Uid,u.Name FROM Comment c
-	JOIN Users u ON u.Uid = c.Uid
-WHERE c.Pid IN (SELECT p.Pid FROM Post p WHERE p.Uid = (SELECT Uid FROM Users WHERE Name = 'Neel'))
+SELECT c.Comment_Uid,u.Name FROM Comment c
+	JOIN Users u ON u.Uid = c.Comment_Uid
+WHERE c.Comment_Pid IN (SELECT p.Pid FROM Post p WHERE p.Post_Uid = (SELECT Uid FROM Users WHERE Name = 'Neel'))
 
 
 
@@ -656,8 +665,8 @@ WHERE c.Pid IN (SELECT p.Pid FROM Post p WHERE p.Uid = (SELECT Uid FROM Users WH
 
 SELECT u.Name FROM Users u
 WHERE u.Uid IN 
-( SELECT p.Uid FROM Post p WHERE p.Pid IN 
-(SELECT c.Pid FROM Comment c WHERE c.Uid = (SELECT Uid FROM Users WHERE Name = 'Romish')))
+( SELECT p.Post_Uid FROM Post p WHERE p.Pid IN 
+(SELECT c.Comment_Pid FROM Comment c WHERE c.Comment_Uid = (SELECT Uid FROM Users WHERE Name = 'Romish')))
 
 
 ----- Like ------
@@ -788,23 +797,22 @@ SELECT grp_name,GroupId FROM Groups
 
 -- chat of group 1
 SELECT m.Message,u.Name FROM GroupMessage m
-	JOIN Users u ON u.Uid = m.UserID
+	JOIN Users u ON u.Uid = m.GroupMessage_Uid
 WHERE m.grp_id = 1
 
 -- Members of groupid 5
-SELECT gm.UserId,u.Name FROM GroupMember gm
-	JOIN Users u ON u.Uid = gm.UserId
+SELECT gm.GroupMember_Uid,u.Name FROM GroupMember gm
+	JOIN Users u ON u.Uid = gm.GroupMember_Uid
 WHERE gm.Group_id = 5
 
 
 -- name of all members with group name 
 SELECT * FROM GroupMember gm
-	JOIN Users u ON u.Uid = gm.UserId
-
+	JOIN Users u ON u.Uid = gm.GroupMember_Uid
 
 -- display user name who is in more than 1 group
 SELECT u.Name FROM Users u
-	JOIN GroupMember m ON m.UserId = u.Uid
+	JOIN GroupMember m ON m.GroupMember_Uid = u.Uid
 GROUP BY u.Name
 HAVING COUNT(m.Group_id) > 1
 
