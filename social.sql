@@ -523,94 +523,94 @@ IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND 
 
 /*1. Write a query to display all details of private account */
 
-select * from Users where Visible = 1;
+SELECT * FROM Users WHERE Visible = 1;
 
 /*2. Write query to display total account from perticular city */
 
-select count(uid) "Account",City 
-from Users 
+SELECT COUNT(uid) "Account",City 
+FROM Users 
 JOIN Location
-ON Users.Locationid = Location.Locationid
-group by city order by Account DESC
+ON Users.Users_Locationid = Location.Locationid
+GROUP BY city ORDER BY Account DESC
 
 /*3. Write a query to display name and city of users who are from rajkot or Mumbai*/
 
-select Name,city
-from Users
+SELECT Name,city
+FROM Users
 JOIN Location
-ON Users.Locationid = Location.Locationid
-where Location.City IN ('Rajkot','Mumbai')
+ON Users.Users_Locationid = Location.Locationid
+WHERE Location.City IN ('Rajkot','Mumbai')
 
 /*4. write a query to display category name start with H*/
 
-select category_name from Categories where Category_Name like 'H%'
+SELECT category_name FROM Categories WHERE Category_Name LIKE 'H%'
 
 /*5. Write a query to display title of post and catagary name of user neeel*/
 
-select name,Title,Category_Name 
-from Users
-join Post
-on Users.Uid=post.Uid
-join Categories
-on Categories.Category_ID = post.Category_ID
-where Users.Name = 'Neel'
+SELECT name,Title,Category_Name 
+FROM Users
+JOIN Post
+ON Users.Uid=post.Post_Uid
+JOIN Categories
+ON Categories.Category_ID = post.Post_Category_ID
+WHERE Users.Name = 'Neel'
 
 /*6. write a query to display friend name of user Romish*/
 
-Select name from Users where Uid IN
-(Select Frid_r from FriendRequest where FriendStatus = 1 AND Uid_s = 
-(Select uid from users where name = 'Romish'))
+SELECT name FROM Users WHERE Uid IN
+(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendStatus = 1 AND FriendRequest_Uid = 
+(SELECT uid FROM users WHERE name = 'Romish'))
 OR
 Uid IN
-(Select Uid_s from FriendRequest where FriendStatus = 1 AND Frid_r = 
-(Select uid from users where name = 'Romish'))
+(SELECT FriendRequest_Uid FROM FriendRequest WHERE FriendStatus = 1 AND FriendRequest_Frid = 
+(SELECT uid FROM users WHERE name = 'Romish'))
 
 
 /*7. write a query to display all the message send by prit*/
 
-select Msg from Chat
-join Users
-on users.Uid = chat.Sender
-where name = 'Prit' 
+SELECT Msg FROM Chat
+JOIN Users
+ON users.Uid = chat.Sender
+WHERE name = 'Prit' 
 
 /*8. write a query to display catagory all categories used by user order by category name*/
 
-select Category_Name from Categories where Category_ID IN (select Category_ID from Post) ORDER by Category_Name
+SELECT Category_Name FROM Categories WHERE Category_ID IN (SELECT Post_Category_ID FROM Post) ORDER BY Category_Name
 
 /*9. write a query display category name which is never possted by any user*/
 
-select category_ID, category_name from Categories where Category_ID NOT IN (select Category_ID from post)
+SELECT category_ID, category_name FROM Categories WHERE Category_ID NOT IN (SELECT Post_Category_ID FROM post)
 
 /*10. Write a query to display comment made by Prit*/
 
-Select Comment_Text from Comment where Uid = 
-(select Uid from users where name = 'Prit')
+SELECT Comment_Text FROM Comment WHERE Comment_Uid = 
+(SELECT Uid FROM users WHERE name = 'Prit')
 
 /*11. Write a query to display comment made on vivek's post*/
 
-select comment_text from comment where pid IN 
-(select pid from post where uid = 
-(select uid from users where name = 'vivek'))
+SELECT comment_text FROM comment WHERE Comment_Pid IN 
+(SELECT pid FROM post WHERE Post_Uid = 
+(SELECT uid FROM users WHERE name = 'vivek'))
 
 /*12. Write a query to display comment made on pratik's post with username*/
 
-select comment_text,name from comment 
-join users 
-on Comment.Uid = Users.Uid 
-where pid IN 
-(select pid from post where uid = 
-(select uid from users where name = 'pratik'))
+SELECT comment_text,name FROM comment 
+JOIN users 
+ON Comment.Comment_Uid = Users.Uid 
+WHERE Comment_Pid IN 
+(SELECT pid FROM post WHERE Post_Uid = 
+(SELECT uid FROM users WHERE name = 'pratik'))
 
 /*13. Write a query to display a name of user with post title on which maximum comments are made*/
 
-select Users.Uid,Users.name,Post.pid,Post.title 
-from Post 
+SELECT Users.Uid,Users.name,Post.pid,Post.title 
+FROM Post 
 JOIN Users
-ON Post.Uid = Users.Uid
-where pid = 
-(select pid from 
-(select TOP 1 count(pid) "comment",pid 
-from comment group by pid order by comment DESC )temp)
+ON Post.Post_Uid = Users.Uid
+WHERE Post.Pid = 
+(SELECT Comment_Pid FROM 
+(SELECT TOP 1 COUNT(Comment_Pid) "comment",Comment_Pid 
+FROM comment GROUP BY Comment_Pid ORDER BY comment DESC )temp)
 
 
 /* Comment table */
