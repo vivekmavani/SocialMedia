@@ -19,13 +19,9 @@ Email nvarchar(50) not null CONSTRAINT Email_validation CHECK(Email LIKE '%_@__%
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 Created_date DATE  DEFAULT GETDATE(),
 Dateofbirth DATE not null,
-Visible int not null CONSTRAINT visibility_chk FOREIGN KEY  REFERENCES  Master(Master_id) ON DELETE CASCADE ON UPDATE CASCADE,
- CONSTRAINT visibility_chk_in check(Visible IN(1,2)),
+Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
 Password varbinary(200) not null,
-Gender int not null  CONSTRAINT gender_fk FOREIGN KEY  REFERENCES  Master(Master_id) ON DELETE CASCADE ON UPDATE CASCADE,
-CONSTRAINT visibility_chk_in check(Visible IN(3,4,5)),
-Status int not null  CONSTRAINT status_check_fk FOREIGN KEY  REFERENCES  Master(Master_id) ON DELETE CASCADE ON UPDATE CASCADE,
-CONSTRAINT status_check check(Visible IN(6,7)),
+Gender not null nchar(1)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
 )
 CREATE TABLE Categories
 (
@@ -122,7 +118,8 @@ Sendtime Datetime DEFAULT GETDATE()
 CREATE TABLE Tags(
 	Tag_ID INT CONSTRAINT PK_Tag_ID PRIMARY KEY IDENTITY(1,1),
 	Tags_Pid INT NOT NULL CONSTRAINT FK_Tags_Post_Tags_Pid FOREIGN KEY REFERENCES Post(Pid),
-	Tags_Uid INT NOT NULL CONSTRAINT FK_Tags_Users_Tags_Uid FOREIGN KEY REFERENCES Users(Uid)
+	Tags_Uid INT NOT NULL CONSTRAINT FK_Tags_Users_Tags_Uid FOREIGN KEY REFERENCES Users(Uid),
+      CONSTRAINT UNIQUE_Tags UNIQUE(Tags_Pid,Tags_Uid)
 )
 
 ALTER TABLE Tags
@@ -387,6 +384,13 @@ SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Users U ON U.Uid = P.Uid WHERE U.N
 SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Categories C ON C.Category_ID = P.Post_Category_ID
 WHERE C.Category_Name = 'Album'
 
+--7.Count of Tags par post
+SELECT Tags_Pid,COUNT(Tags_Pid) AS 'count tag per post' FROM Tags GROUP BY Tags_Pid
+
+--8.which user how many tags added
+
+SELECT U.Name, SUM([COUNT_C]) FROM (SELECT Tags_Pid,COUNT(Tags_Pid) AS [COUNT_C] FROM Tags GROUP BY Tags_Pid)TAMP JOIN Post P 
+ON TAMP.TAGS_PID=P.Pid JOIN Users U ON P.Post_Uid = U.Uid GROUP BY U.Name
 
 -- send friend request 
 INSERT INTO FriendRequest VALUES 
@@ -437,57 +441,49 @@ WHERE u.Name = 'Prit'
 
 -- Display mutual friends
 
-SELECT u.Name FROM Users u WHERE u.Uid IN 
+  SELECT u.Name FROM Users u WHERE u.Uid IN 
 (
-SELECT fa.Frid_r FROM FriendRequest fa
-WHERE fa.Uid_s = 2
+SELECT fa.FriendRequest_Frid FROM FriendRequest fa
+WHERE fa.FriendRequest_Uid = 2
 INTERSECT
-SELECT fa.Frid_r FROM FriendRequest fa
-WHERE fa.Uid_s = 5
+SELECT fa.FriendRequest_Frid FROM FriendRequest fa
+WHERE fa.FriendRequest_Uid = 5
 )
-
 
 -- All users with its category name of Post
 
 SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
-	LEFT JOIN Post p ON p.Uid = u.Uid
-	LEFT JOIN Categories c ON c.Category_ID = p.Category_ID
-
-
-
+	LEFT JOIN Post p ON p.Post_Uid = u.Uid
+	LEFT JOIN Categories c ON c.Category_ID = p.Post_Category_ID
 
 -- List of friends
 SELECT COUNT(*) FROM 
-(SELECT f.Uid_s,f.Frid_r,f.FriendStatus FROM FriendRequest f
-	LEFT JOIN Users u ON f.Uid_s = u.Uid
+(SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus FROM FriendRequest f
+	LEFT JOIN Users u ON f.FriendRequest_Uid = u.Uid
 WHERE u.Name = 'Prit'
 UNION
-SELECT f.Uid_s,f.Frid_r,f.FriendStatus FROM FriendRequest f
-	LEFT JOIN Users u ON f.Frid_r = u.Uid
+SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus FROM FriendRequest f
+	LEFT JOIN Users u ON f.FriendRequest_Frid = u.Uid
 WHERE u.Name = 'Prit') temp
 WHERE FriendStatus = 1
 
-
 -- List of users who have not posted anything
 SELECT Name,Uid FROM Users
-WHERE uid NOT IN (SELECT Uid FROM Post)
+WHERE uid NOT IN (SELECT Post_Uid FROM Post)
 
 
 -- Number of Post of all users
-SELECT COUNT(Pid) as 'no. of post',
-		Uid,
-		(SELECT Name FROM Users WHERE Uid = Post.Uid) as 'Name' 
-FROM Post 
-GROUP BY Uid
 
+SELECT COUNT(Pid) as 'no. of post',Post_Uid,
+(SELECT Name FROM Users WHERE Uid = Post.Post_Uid) as 'Name' 
+FROM Post 
+GROUP BY Post_Uid
 
 
 -- List of users with 0 friends
+
 SELECT Uid FROM Users 
-WHERE Uid NOT IN (SELECT Uid_s FROM FriendRequest UNION SELECT Frid_r FROM FriendRequest)
-
-
-
+WHERE Uid NOT IN (SELECT FriendRequest_Frid FROM FriendRequest UNION SELECT FriendRequest_Frid FROM FriendRequest)
 
 -- Users with total friends
 SELECT Uid_s as 'userID',COUNT(Frid_r) FROM 
