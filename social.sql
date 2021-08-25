@@ -778,6 +778,25 @@ SELECT DATEDIFF(DAY,Requested_Date,Approved_Date) FROM FriendRequest
 -- time of friend req. is approved
 SELECT DATEDIFF(DAY,Approved_Date,GETDATE()) FROM FriendRequest
 
+
+--Today's birthday 
+SELECT DATEDIFF(dd,Dateofbirth,GETDATE())/365 as age,  'Happy Birthday ' +
+Name as HappyBirthday  FROM Users WHERE 
+DATEPART(mm,GETDATE())-DATEPART(mm,Dateofbirth)=0 
+AND DATEPART(dd,GETDATE())-DATEPART(dd,Dateofbirth)=0
+
+-- Your Friend's Birthday (Today)
+SELECT DATEDIFF(dd,Dateofbirth,GETDATE())/365 as age, 
+Name as HappyBirthday  FROM Users WHERE 
+DATEPART(mm,GETDATE())-DATEPART(mm,Dateofbirth)=0 
+AND DATEPART(dd,GETDATE())-DATEPART(dd,Dateofbirth)=0 AND Uid
+IN(SELECT Uid FROM  Users WHERE  Uid  IN 
+(Select DISTINCT FriendRequest_Uid FROM  
+FriendRequest WHERE FriendRequest_Frid = 3 AND FriendStatus = 1)
+OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
+FriendRequest WHERE FriendRequest_Uid  = 3 AND FriendStatus = 1))
+
+
 INSERT INTO Groups VALUES
 ('grp1','this is our college group',2,'2021-01-01'),
 ('grp2','this is our School group',3,'2021-02-01'),
