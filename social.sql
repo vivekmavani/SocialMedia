@@ -19,9 +19,13 @@ Email nvarchar(50) not null CONSTRAINT Email_validation CHECK(Email LIKE '%_@__%
 PhoneNumber varchar(10) not null CONSTRAINT pn CHECK(PhoneNumber LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 Created_date DATE  DEFAULT GETDATE(),
 Dateofbirth DATE not null,
-Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)), 
+Visible int not null CONSTRAINT visibility_chk FOREIGN KEY  REFERENCES  Master(Master_id) ON DELETE CASCADE ON UPDATE CASCADE,
+ CONSTRAINT visibility_chk_in check(Visible IN(1,2)),
 Password varbinary(200) not null,
-Gender not null nchar(1)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
+Gender int not null  CONSTRAINT gender_fk FOREIGN KEY  REFERENCES  Master(Master_id) ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT visibility_chk_in check(Visible IN(3,4,5)),
+Status int not null  CONSTRAINT status_check_fk FOREIGN KEY  REFERENCES  Master(Master_id) ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT status_check check(Visible IN(6,7)),
 )
 CREATE TABLE Categories
 (
