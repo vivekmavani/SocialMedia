@@ -608,6 +608,26 @@ WHERE Post.Pid =
 (SELECT TOP 1 COUNT(Comment_Pid) "comment",Comment_Pid 
 FROM comment GROUP BY Comment_Pid ORDER BY comment DESC )temp)
 
+/*14. Write a query to display Groupid,Group name and group members name which is created by prit */
+
+SELECT group_id, grp_name,users.Name "GroupMembers" FROM users 
+JOIN GroupMember
+ON GroupMember.GroupMember_Uid = Users.Uid
+JOIN Groups
+ON Groups.GroupId = GroupMember.Group_id
+WHERE groups.Created_By = (SELECT Uid FROM users WHERE name = 'prit')
+
+/*15. Write a query to display all image of romish's post*/
+
+SELECT * FROM Image WHERE Imageid IN 
+(SELECT pid FROM post WHERE Post_Uid = 
+(SELECT uid FROM Users WHERE name = 'Romish'))
+
+/*16. write a query to display a name of users who are taged in viveks post*/
+ SELECT name FROM Users WHERE Uid in 
+(SELECT Tags_Uid FROM Tags WHERE Tags_Pid = 
+(SELECT pid FROM post WHERE Post_Uid = (SELECT uid FROM users WHERE name = 'Vivek')))
+
 
 /* Comment table */
 
