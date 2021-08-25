@@ -453,11 +453,15 @@ SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
 
 
 -- List of friends
-SELECT f.Frid_r,(SELECT u.Name FROM Users u WHERE u.Uid = f.Frid_r) as 'friend_name' FROM FriendRequest f
-	JOIN Users u ON u.Uid = f.Uid_s 
+SELECT COUNT(*) FROM 
+(SELECT f.Uid_s,f.Frid_r,f.FriendStatus FROM FriendRequest f
+	LEFT JOIN Users u ON f.Uid_s = u.Uid
 WHERE u.Name = 'Prit'
-ORDER BY f.Frid_r
-
+UNION
+SELECT f.Uid_s,f.Frid_r,f.FriendStatus FROM FriendRequest f
+	LEFT JOIN Users u ON f.Frid_r = u.Uid
+WHERE u.Name = 'Prit') temp
+WHERE FriendStatus = 1
 
 
 -- List of users who have not posted anything
@@ -480,11 +484,28 @@ WHERE Uid NOT IN (SELECT Uid_s FROM FriendRequest UNION SELECT Frid_r FROM Frien
 
 
 
+
 -- Users with total friends
-SELECT u.Uid,
-		u.Name,
-		(SELECT COUNT(f.Frid_r) FROM FriendRequest f WHERE f.Uid_s = u.Uid GROUP BY f.Uid_s) as 'No of friends'
-FROM Users u
+SELECT Uid_s as 'userID',COUNT(Frid_r) FROM 
+(SELECT f.Uid_s,f.Frid_r,f.FriendStatus as 'fs' FROM FriendRequest f) temp
+WHERE fs = 1
+GROUP BY Uid_s
+UNION
+SELECT Frid_r as 'UserID',COUNT(Uid_s) FROM 
+(SELECT f.Uid_s,f.Frid_r,f.FriendStatus as 'fs' FROM FriendRequest f) temp
+WHERE fs = 1
+GROUP BY Frid_r
+
+
+-- OR 
+SELECT Uid_s as 'userID',COUNT(Frid_r) FROM  FriendRequest
+WHERE friendstatus = 1
+GROUP BY Uid_s
+UNION
+SELECT Frid_r as 'userID',COUNT(Uid_s) FROM  FriendRequest
+WHERE friendstatus = 1
+GROUP BY Frid_r
+
 
 -- friend suggestions 
 SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT FriendRequest_Uid FROM 
@@ -621,11 +642,12 @@ GROUP BY u.Name
 ORDER BY max_like DESC
 
 
--- List of users commented on Prit's post
+-- List of users commented on Neel's post
 
 SELECT c.Uid,u.Name FROM Comment c
 	JOIN Users u ON u.Uid = c.Uid
-WHERE c.Pid = (SELECT Uid FROM Users WHERE Name = 'prit')
+WHERE c.Pid IN (SELECT p.Pid FROM Post p WHERE p.Uid = (SELECT Uid FROM Users WHERE Name = 'Neel'))
+
 
 
 
