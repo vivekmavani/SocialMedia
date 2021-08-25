@@ -487,7 +487,7 @@ SELECT Uid FROM Users
 WHERE Uid NOT IN (SELECT FriendRequest_Frid FROM FriendRequest UNION SELECT FriendRequest_Frid FROM FriendRequest)
 
 -- Users with total friends
-SELECT Uid_s as 'userID',COUNT(Frid_r) FROM 
+SELECT Uid_s as 'userID',COUNT(FriendRequest_Frid) FROM 
 (SELECT f.Uid_s,f.Frid_r,f.FriendStatus as 'fs' FROM FriendRequest f) temp
 WHERE fs = 1
 GROUP BY Uid_s
