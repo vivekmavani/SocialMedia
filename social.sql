@@ -731,7 +731,7 @@ SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a
 FROM Post a JOIN Categories b
 ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
 WHERE
-a.Pid IN(SELECT Pid FROM Likebyuser WHERE LikebyUser_Uid IN (SELECT Uid FROM friendoffriend))
+a.Pid IN(SELECT LikebyUser_Pid FROM Likebyuser WHERE LikebyUser_Uid IN (SELECT Uid FROM friendoffriend))
 
 --
 --  acceapt request .
