@@ -746,6 +746,12 @@ OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
 FriendRequest WHERE FriendRequest_Uid  IN (SELECT Uid FROM friends)
 AND FriendStatus = 1 AND FriendRequest_Frid <> 1)
 
+-- friend anniversary 
+SELECT DATEDIFF(YEAR,Approved_Date,GETDATE()) 'years of friend anniversary' FROM FriendRequest WHERE DATEDIFF(YEAR,Approved_Date,GETDATE()) >=1
+-- diffent of friend req. is approved
+SELECT DATEDIFF(DAY,Requested_Date,Approved_Date) FROM FriendRequest
+-- time of friend req. is approved
+SELECT DATEDIFF(DAY,Approved_Date,GETDATE()) FROM FriendRequest
 
 INSERT INTO Groups VALUES
 ('grp1','this is our college group',2,'2021-01-01'),
