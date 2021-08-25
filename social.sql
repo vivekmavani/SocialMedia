@@ -222,7 +222,7 @@ GO
 
 INSERT INTO [dbo].[Users]
            ([Name]
-           ,[Locationid]
+           ,[Users_Locationid]
            ,[Address]
            ,[Email]
            ,[PhoneNumber]
@@ -230,17 +230,18 @@ INSERT INTO [dbo].[Users]
            ,[Dateofbirth]
            ,[Visible]
            ,[Password]
-           ,[Gender])
+           ,[Gender],
+           [Status])
      VALUES
-          ('Romish',1,'Address 1','romish@gmail.com',2545874962,GETDATE(),'1999-02-01',0,EncryptByPassPhrase('key', 'romish123' ),'M'),
-('Prit',1,'Address 2','prit@gmail.com',7458963215,GETDATE(),'1998-02-01',1,EncryptByPassPhrase('key', 'prit123' ),'M'),
-('Vivek',2,'Address 3','Vivek@gmail.com',1205874965,GETDATE(),'1997-02-01',1,EncryptByPassPhrase('key', 'vivek123' ),'M'),
-('Neel',2,'Address 4','nell@gmail.com',9657432018,GETDATE(),'1996-02-01',0,EncryptByPassPhrase('key', 'neel135' ),'M'),
-('Jay',2,'Address 5','jay@gmail.com',7452013601,GETDATE(),'1995-02-01',0,EncryptByPassPhrase('key', 'jay456' ),'M'),
-('Pratik',3,'Address 6','pratik@gmail.com',9658002341,GETDATE(),'1994-02-01',0,EncryptByPassPhrase('key', 'pratik123' ),'M'),
-('Karan',4,'Address 7','karan@gmail.com',1234567890,GETDATE(),'1993-02-01',0,EncryptByPassPhrase('key', 'karan147' ),'M'),
-('Veera',5,'Address 8','veer@gmail.com',1518960214,GETDATE(),'1992-02-01',0,EncryptByPassPhrase('key', 'veer123' ),'O'),
-('Meena',6,'Address 9','meet@gmail.com',7850123604,GETDATE(),'1991-02-01',0,EncryptByPassPhrase('key', 'meet745' ),'F');
+          ('Romish',1,'Address 1','romish@gmail.com',2545874962,GETDATE(),'1999-02-01',0,EncryptByPassPhrase('key', 'romish123' ),3,6),
+('Prit',1,'Address 2','prit@gmail.com',7458963215,GETDATE(),'1998-02-01',1,EncryptByPassPhrase('key', 'prit123' ),4,7),
+('Vivek',2,'Address 3','Vivek@gmail.com',1205874965,GETDATE(),'1997-02-01',1,EncryptByPassPhrase('key', 'vivek123' ),3,6),
+('Neel',2,'Address 4','nell@gmail.com',9657432018,GETDATE(),'1996-02-01',0,EncryptByPassPhrase('key', 'neel135' ),3,6),
+('Jay',2,'Address 5','jay@gmail.com',7452013601,GETDATE(),'1995-02-01',0,EncryptByPassPhrase('key', 'jay456' ),3,6),
+('Pratik',3,'Address 6','pratik@gmail.com',9658002341,GETDATE(),'1994-02-01',0,EncryptByPassPhrase('key', 'pratik123' ),3,6),
+('Karan',4,'Address 7','karan@gmail.com',1234567890,GETDATE(),'1993-02-01',0,EncryptByPassPhrase('key', 'karan147' ),3,6),
+('Veera',5,'Address 8','veer@gmail.com',1518960214,GETDATE(),'1992-02-01',0,EncryptByPassPhrase('key', 'veer123' ),3,6),
+('Meena',6,'Address 9','meet@gmail.com',7850123604,GETDATE(),'1991-02-01',0,EncryptByPassPhrase('key', 'meet745' ),3,6);
 GO
 
 update Users
@@ -518,94 +519,94 @@ IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND 
 
 /*1. Write a query to display all details of private account */
 
-select * from Users where Visible = 1;
+SELECT * FROM Users WHERE Visible = 1;
 
 /*2. Write query to display total account from perticular city */
 
-select count(uid) "Account",City 
-from Users 
+SELECT COUNT(uid) "Account",City 
+FROM Users 
 JOIN Location
-ON Users.Locationid = Location.Locationid
-group by city order by Account DESC
+ON Users.Users_Locationid = Location.Locationid
+GROUP BY city ORDER BY Account DESC
 
 /*3. Write a query to display name and city of users who are from rajkot or Mumbai*/
 
-select Name,city
-from Users
+SELECT Name,city
+FROM Users
 JOIN Location
-ON Users.Locationid = Location.Locationid
-where Location.City IN ('Rajkot','Mumbai')
+ON Users.Users_Locationid = Location.Locationid
+WHERE Location.City IN ('Rajkot','Mumbai')
 
 /*4. write a query to display category name start with H*/
 
-select category_name from Categories where Category_Name like 'H%'
+SELECT category_name FROM Categories WHERE Category_Name LIKE 'H%'
 
 /*5. Write a query to display title of post and catagary name of user neeel*/
 
-select name,Title,Category_Name 
-from Users
-join Post
-on Users.Uid=post.Uid
-join Categories
-on Categories.Category_ID = post.Category_ID
-where Users.Name = 'Neel'
+SELECT name,Title,Category_Name 
+FROM Users
+JOIN Post
+ON Users.Uid=post.Post_Uid
+JOIN Categories
+ON Categories.Category_ID = post.Post_Category_ID
+WHERE Users.Name = 'Neel'
 
 /*6. write a query to display friend name of user Romish*/
 
-Select name from Users where Uid IN
-(Select Frid_r from FriendRequest where FriendStatus = 1 AND Uid_s = 
-(Select uid from users where name = 'Romish'))
+SELECT name FROM Users WHERE Uid IN
+(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendStatus = 1 AND FriendRequest_Uid = 
+(SELECT uid FROM users WHERE name = 'Romish'))
 OR
 Uid IN
-(Select Uid_s from FriendRequest where FriendStatus = 1 AND Frid_r = 
-(Select uid from users where name = 'Romish'))
+(SELECT FriendRequest_Uid FROM FriendRequest WHERE FriendStatus = 1 AND FriendRequest_Frid = 
+(SELECT uid FROM users WHERE name = 'Romish'))
 
 
 /*7. write a query to display all the message send by prit*/
 
-select Msg from Chat
-join Users
-on users.Uid = chat.Sender
-where name = 'Prit' 
+SELECT Msg FROM Chat
+JOIN Users
+ON users.Uid = chat.Sender
+WHERE name = 'Prit' 
 
 /*8. write a query to display catagory all categories used by user order by category name*/
 
-select Category_Name from Categories where Category_ID IN (select Category_ID from Post) ORDER by Category_Name
+SELECT Category_Name FROM Categories WHERE Category_ID IN (SELECT Post_Category_ID FROM Post) ORDER BY Category_Name
 
 /*9. write a query display category name which is never possted by any user*/
 
-select category_ID, category_name from Categories where Category_ID NOT IN (select Category_ID from post)
+SELECT category_ID, category_name FROM Categories WHERE Category_ID NOT IN (SELECT Post_Category_ID FROM post)
 
 /*10. Write a query to display comment made by Prit*/
 
-Select Comment_Text from Comment where Uid = 
-(select Uid from users where name = 'Prit')
+SELECT Comment_Text FROM Comment WHERE Comment_Uid = 
+(SELECT Uid FROM users WHERE name = 'Prit')
 
 /*11. Write a query to display comment made on vivek's post*/
 
-select comment_text from comment where pid IN 
-(select pid from post where uid = 
-(select uid from users where name = 'vivek'))
+SELECT comment_text FROM comment WHERE Comment_Pid IN 
+(SELECT pid FROM post WHERE Post_Uid = 
+(SELECT uid FROM users WHERE name = 'vivek'))
 
 /*12. Write a query to display comment made on pratik's post with username*/
 
-select comment_text,name from comment 
-join users 
-on Comment.Uid = Users.Uid 
-where pid IN 
-(select pid from post where uid = 
-(select uid from users where name = 'pratik'))
+SELECT comment_text,name FROM comment 
+JOIN users 
+ON Comment.Comment_Uid = Users.Uid 
+WHERE Comment_Pid IN 
+(SELECT pid FROM post WHERE Post_Uid = 
+(SELECT uid FROM users WHERE name = 'pratik'))
 
 /*13. Write a query to display a name of user with post title on which maximum comments are made*/
 
-select Users.Uid,Users.name,Post.pid,Post.title 
-from Post 
+SELECT Users.Uid,Users.name,Post.pid,Post.title 
+FROM Post 
 JOIN Users
-ON Post.Uid = Users.Uid
-where pid = 
-(select pid from 
-(select TOP 1 count(pid) "comment",pid 
-from comment group by pid order by comment DESC )temp)
+ON Post.Post_Uid = Users.Uid
+WHERE Post.Pid = 
+(SELECT Comment_Pid FROM 
+(SELECT TOP 1 COUNT(Comment_Pid) "comment",Comment_Pid 
+FROM comment GROUP BY Comment_Pid ORDER BY comment DESC )temp)
 
 
 /* Comment table */
@@ -741,6 +742,12 @@ OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
 FriendRequest WHERE FriendRequest_Uid  IN (SELECT Uid FROM friends)
 AND FriendStatus = 1 AND FriendRequest_Frid <> 1)
 
+-- friend anniversary 
+SELECT DATEDIFF(YEAR,Approved_Date,GETDATE()) 'years of friend anniversary' FROM FriendRequest WHERE DATEDIFF(YEAR,Approved_Date,GETDATE()) >=1
+-- diffent of friend req. is approved
+SELECT DATEDIFF(DAY,Requested_Date,Approved_Date) FROM FriendRequest
+-- time of friend req. is approved
+SELECT DATEDIFF(DAY,Approved_Date,GETDATE()) FROM FriendRequest
 
 INSERT INTO Groups VALUES
 ('grp1','this is our college group',2,'2021-01-01'),
