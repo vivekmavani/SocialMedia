@@ -360,26 +360,26 @@ DELETE FROM [dbo].[Post]
 	(1,2),
 	(3,4)*/
 
---UN FRIEND NEEL AND JAY
+--1.UN FRIEND NEEL AND JAY
 DELETE FROM FriendRequest WHERE FriendRequest_Uid = (SELECT Uid FROM Users WHERE Name='Neel') AND
   FriendRequest_Frid = (SELECT uid FROM Users WHERE Name='Jay')
 
---TODAY'S Tranding post like vias
+--2.TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
 
---Display 18+ user name
+--3.Display 18+ user name
 SELECT Name AS '18+ NAME',DATEDIFF(YY,dateofbirth,getdate()) as age FROM Users WHERE DATEDIFF(YY,dateofbirth,getdate())>18
 
---less than 18 to not show album , financial service,home improvement etc. like categories post
+--4.Less than 18 to not show album , financial service,home improvement etc. like categories post
 
 SELECT * FROM Post WHERE Post_Category_ID IN 
 (SELECT Category_ID FROM Categories WHERE Category_Name NOT IN ('album','financial service','home improvement'))
 AND (SELECT DATEDIFF(YY,dateofbirth,GETDATE()) FROM Users WHERE Uid = 9)<18
 
---search post by name of user
+--5.Search post by name of user
 SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Users U ON U.Uid = P.Uid WHERE U.Name = 'Jay'
 
---search post by categories name
+--6.search post by categories name
 SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Categories C ON C.Category_ID = P.Post_Category_ID
 WHERE C.Category_Name = 'Album'
 
@@ -394,17 +394,19 @@ INSERT INTO FriendRequest VALUES
 
 GO
 SELECT * FROM [FriendRequest]
--- dispaly friend request by id
-SELECT a.Name,a.Uid FROM Users a JOIN FriendRequest b ON a.Uid = b.Frid_r WHERE b.Uid_s = 1  
--- delete request 
-DELETE FROM FriendRequest WHERE Frid_r = 1  AND Uid_s  = 1
---  acceapte request
+
+-- Dispaly friend request by id
+SELECT a.Name,a.Uid FROM Users a JOIN FriendRequest b ON a.Uid = b.FriendRequest_Frid WHERE b.FriendRequest_Uid = 1  
+
+-- Delete Request OR Reject Request
+DELETE FROM FriendRequest WHERE FriendRequest_Frid = 1  AND FriendRequest_Uid  = 1
+
+--  Acceapte Request
+update [FriendRequest]
+  set FriendStatus =1,Approved_Date=('2020-12-10')
+  where FriendRequestid in (5,8)
 
 
-/*INSERT INTO FriendAccept VALUES ((SELECT Uid_s FROM FriendRequest WHERE FriendRequestid = 6),
-                                  (SELECT Frid_r FROM FriendRequest WHERE FriendRequestid = 6)) 
-DELETE FROM FriendRequest WHERE FriendRequestid = 6
-SELECT * FROM FriendAccept */
 SELECT * FROM FriendRequest
 
 
@@ -424,8 +426,8 @@ SELECT * FROM Users
 -- Display category name of user post
 
 SELECT c.Category_Name FROM Categories c
-	INNER JOIN Post p ON p.Category_ID = c.Category_ID
-	INNER JOIN Users u ON u.Uid = p.Uid
+	INNER JOIN Post p ON p.Post_Category_ID = c.Category_ID
+	INNER JOIN Users u ON u.Uid = p.Post_Uid
 WHERE u.Name = 'Prit'
 
 
