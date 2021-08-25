@@ -360,14 +360,9 @@ DELETE FROM [dbo].[Post]
 	(1,2),
 	(3,4)*/
 
---DISPLAY FRIEND
-
-SELECT U.Uid,U.Name FROM FriendAccept FA JOIN Users U ON FA.Uid = U.Uid WHERE FA.Frid = 3
-
---UN FRIEND
-DECLARE @UNFriendAccid INT
-SET @UNFriendAccid = 1
-DELETE FROM [dbo].[FriendAccept] WHERE FriendAccapteid = @UNFriendAccid 
+--UN FRIEND NEEL AND JAY
+DELETE FROM FriendRequest WHERE FriendRequest_Uid = (SELECT Uid FROM Users WHERE Name='Neel') AND
+  FriendRequest_Frid = (SELECT uid FROM Users WHERE Name='Jay')
 
 --TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
@@ -377,15 +372,15 @@ SELECT Name AS '18+ NAME',DATEDIFF(YY,dateofbirth,getdate()) as age FROM Users W
 
 --less than 18 to not show album , financial service,home improvement etc. like categories post
 
-SELECT * FROM Post WHERE Category_ID IN 
+SELECT * FROM Post WHERE Post_Category_ID IN 
 (SELECT Category_ID FROM Categories WHERE Category_Name NOT IN ('album','financial service','home improvement'))
 AND (SELECT DATEDIFF(YY,dateofbirth,GETDATE()) FROM Users WHERE Uid = 9)<18
 
 --search post by name of user
-SELECT P.Pid,P.Title,P.Image,P.Likes FROM Post P JOIN Users U ON U.Uid = P.Uid WHERE U.Name = 'Jay'
+SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Users U ON U.Uid = P.Uid WHERE U.Name = 'Jay'
 
 --search post by categories name
-SELECT P.Pid,P.Title,P.Image,P.Likes FROM Post P JOIN Categories C ON C.Category_ID = P.Category_ID
+SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Categories C ON C.Category_ID = P.Post_Category_ID
 WHERE C.Category_Name = 'Album'
 
 
