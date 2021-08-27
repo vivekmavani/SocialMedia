@@ -292,7 +292,7 @@ ORDER BY msg_time
 UPDATE Chat
 SET Msg = 'I am creating database of Social media'
 WHERE msg_time = '2021-08-19 13:29:22.713'
-
+--add uid
 
 -- DELETE FROM Chat WHERE msg_time = '2021-08-19 13:29:22.713'
 -- DELETE FROM Chat WHERE Sender = 1 AND Receiver = 2
@@ -410,7 +410,7 @@ SELECT a.Name,a.Uid FROM Users a JOIN FriendRequest b ON a.Uid = b.FriendRequest
 
 -- Delete Request OR Reject Request
 DELETE FROM FriendRequest WHERE FriendRequest_Frid = 1  AND FriendRequest_Uid  = 1
-
+-- change 0 or 1
 --  Acceapte Request
 update [FriendRequest]
   set FriendStatus =1,Approved_Date=('2020-12-10')
