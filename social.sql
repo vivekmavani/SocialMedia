@@ -52,7 +52,7 @@ FriendStatus bit not null,
 Requested_Date DATE  not null DEFAULT GETDATE(),
  Approved_Date DATE 
 )
-
+-- add column read or unread add to the master table and set fk in this table
 CREATE TABLE Chat
 (
 Chat_id int PRIMARY KEY IDENTITY(1,1),
@@ -96,7 +96,7 @@ Date_joined date DEFAULT GETDATE(),
 CONSTRAINT unqMember UNIQUE(Group_id,UserId)
 )
 
--- group message
+-- group message (add new table for who read the message)(GroupMessage_Groupid,GroupMember_Uid)
 CREATE TABLE GroupMessage
 (
 GroupMessage_Groupid INT NOT NULL CONSTRAINT PK_GroupMessage_Groupid PRIMARY KEY IDENTITY(1,1),
