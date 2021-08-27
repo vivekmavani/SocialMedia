@@ -2,6 +2,7 @@
 CREATE DATABASE socialmedia1
 
 USE socialmedia1
+
 Create Table Location(
 Locationid INT PRIMARY KEY IDENTITY(1,1),
 City VARCHAR(20) not null,
@@ -23,6 +24,7 @@ Visible TINYINT DEFAULT 1 CONSTRAINT employees_date CHECK(Visible IN (0,1)),
 Password varbinary(200) not null,
 Gender not null nchar(1)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
 )
+
 CREATE TABLE Categories
 (
 Category_ID smallint constraint PK_Categories_Category_ID PRIMARY KEY IDENTITY(1,1),
@@ -50,17 +52,7 @@ FriendStatus bit not null,
 Requested_Date DATE  not null DEFAULT GETDATE(),
  Approved_Date DATE 
 )
---add columns in FriendRequest
- ALTER TABLE FriendRequest ALTER COLUMN FriendStatus bit  not null 
- ALTER TABLE FriendRequest ADD  Requested_Date DATE  not null DEFAULT GETDATE()
- ALTER TABLE FriendRequest ADD  Approved_Date DATE  null
-/*CREATE TABLE FriendAccept
-(
-FriendAccapteid int   CONSTRAINT FriendAccapteid_FriendAccapte PRIMARY KEY  IDENTITY(1,1),
-Uid int not null CONSTRAINT Uid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid) ,
-Frid int not null CONSTRAINT Frid_FriendAccapte FOREIGN KEY  REFERENCES  Users(Uid),
-CONSTRAINT unique_FriendAccapte UNIQUE(Uid,Frid)
-)*/
+
 CREATE TABLE Chat
 (
 Chat_id int PRIMARY KEY IDENTITY(1,1),
@@ -122,8 +114,7 @@ CREATE TABLE Tags(
       CONSTRAINT UNIQUE_Tags UNIQUE(Tags_Pid,Tags_Uid)
 )
 
-ALTER TABLE Tags
-ADD CONSTRAINT UNIQUE_Tags UNIQUE(Tags_Pid,Tags_Uid)
+
 
 -- Master table
 CREATE TABLE Master
@@ -206,7 +197,7 @@ GO
 
 
 
-SELECT Category_Name 'Categories' FROM Categories ORDER BY Category_Name
+
 
 UPDATE [dbo].[Categories]
    SET [Category_Name] = 'Albums'
@@ -244,15 +235,7 @@ INSERT INTO [dbo].[Users]
 ('Meena',6,'Address 9','meet@gmail.com',7850123604,GETDATE(),'1991-02-01',0,EncryptByPassPhrase('key', 'meet745' ),3,6);
 GO
 
-update Users
-set Visible = 1 
-where Uid IN (6,7)
 
-
-select * from Users
---Decrypt
-Select Name,City,Email,PhoneNumber,convert(varchar(100),DecryptByPassPhrase('key',Password )) as Password from Users
--- Queries for Chat database
 
 INSERT INTO Chat VALUES
 (1,2,'hello','2021-08-19 13:25:52.813'),
@@ -266,55 +249,14 @@ INSERT INTO Chat VALUES
 (4,3,'I am learning HTML','2021-08-19 13:29:22.713')
 
 
+
+
 INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2) ,(SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4),'hi','2021-08-19 16:21:22.713')
+((SELECT DISTINCT FriendRequest_Uid FROM FriendRequest WHERE FriendRequest_Frid = 2) 
+,(SELECT DISTINCT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Frid = 4),'how are you','2021-08-19 16:22:22.713'),
+((SELECT DISTINCT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Frid = 4)
+ ,(SELECT DISTINCT FriendRequest_Uid FROM FriendRequest WHERE FriendRequest_Uid = 2),'I am fine','2021-08-19 17:22:22.713')
 
-INSERT INTO Chat VALUES
-((SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2) ,(SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4),'how are you','2021-08-19 16:22:22.713'),
-((SELECT DISTINCT Frid_r FROM FriendRequest WHERE Frid_r = 4) ,(SELECT DISTINCT Uid_s FROM FriendRequest WHERE Uid_s = 2),'I am fine','2021-08-19 17:22:22.713')
-
-
-DECLARE @Sender int
-SET @Sender = 1
-
-DECLARE @Receiver int
-SET @Receiver = 2
-
-SELECT
-	(SELECT u.Name FROM Users u WHERE u.Uid = c.Sender) as 'Sender', 
-	(SELECT u.Name FROM Users u WHERE u.Uid = c.Receiver) as 'Receiver', 
-	c.Msg
-FROM Chat c
-WHERE (Sender = @Sender AND Receiver = @Receiver) OR (Sender = @Receiver AND Receiver = @Sender)
-ORDER BY msg_time
-
-
-UPDATE Chat
-SET Msg = 'I am creating database of Social media'
-WHERE msg_time = '2021-08-19 13:29:22.713'
---add uid
-
--- DELETE FROM Chat WHERE msg_time = '2021-08-19 13:29:22.713'
--- DELETE FROM Chat WHERE Sender = 1 AND Receiver = 2
-
-USE socialmedia
-GO
-
---DISPLAY ALL POST
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Users U ON P.Uid = U.Uid 
-WHERE U.Visible = 1
-
---DISPLAY ALL POST FOR ONLY FRIEND
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccept FA ON P.Uid = FA.Uid
-
---DISPLAY POST BUT CATAGORIES VISE
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Categories C ON 
-P.Category_ID = C.Category_ID where C.Category_Name = 'Art'
-
---UPDATE POST LIKE
-DECLARE @POSTID INT
-SET @POSTID = 1
-UPDATE Post SET Likes = Likes + 1 WHERE Pid = @POSTID
 
 --ADD POST BY FRIEND
 	INSERT INTO [dbo].[Post]
@@ -338,34 +280,87 @@ UPDATE Post SET Likes = Likes + 1 WHERE Pid = @POSTID
 	('decoration','fastival decor','img_21.png',30,23,8,GETDATE())
 GO
 
+-- send friend request 
+INSERT INTO FriendRequest VALUES 
+	(1,5,0),
+	(2,6,0),
+	(5,4,0),
+	(1,2,0),
+	(3,4,0)
 
---UPDATE POST BUT FRIEND
-UPDATE [dbo].[Post]
-   SET [Title] = <Title, varchar(20),>
-      ,[Description] = <Description, varchar(100),>
-      ,[Image] = <Image, varchar(100),>
-      ,[Likes] = <Likes, int,>
-      ,[Category_ID] = <Category_ID, int,>
-      ,[Uid] = <Uid, int,>
+GO
 
---DELETE POST 
-
-DELETE FROM [dbo].[Post]
+/* Comment table */
 
 
---FRIEND ACCAPTE TABLE DATA
-/*INSERT INTO FriendAccept VALUES (1,3),
-	(2,3),
-	(2,4),
-	(1,5),
-	(2,6),
-	(5,4),
-	(1,2),
-	(3,4)*/
+INSERT INTO Comment
+Values
+('Nice Pic',1,2),
+('Beautifull',2,3),
+('Great Picture',2,4),
+('Good',5,3),
+('Nice Place',3,6)
 
---1.UN FRIEND NEEL AND JAY
+-- update
+update Users
+set Visible = 1 
+where Uid IN (6,7)
+UPDATE Chat
+SET Msg = 'I am creating database of Social media'
+WHERE msg_time = '2021-08-19 13:29:22.713'
+
+--UPDATE POST LIKE
+DECLARE @POSTID INT
+SET @POSTID = 1
+UPDATE Post SET Likes = Likes + 1 WHERE Pid = @POSTID
+
+--select
+
+SELECT Category_Name 'Categories' FROM Categories ORDER BY Category_Name
+select * from Users
+--Decrypt
+Select Name,City,Email,PhoneNumber,convert(varchar(100),DecryptByPassPhrase('key',Password )) as Password from Users
+-- Queries for Chat database
+
+
+DECLARE @Sender int
+SET @Sender = 1
+
+DECLARE @Receiver int
+SET @Receiver = 2
+
+SELECT
+	(SELECT u.Name FROM Users u WHERE u.Uid = c.Sender) as 'Sender', 
+	(SELECT u.Name FROM Users u WHERE u.Uid = c.Receiver) as 'Receiver', 
+	c.Msg
+FROM Chat c
+WHERE (Sender = @Sender AND Receiver = @Receiver) OR (Sender = @Receiver AND Receiver = @Sender)
+ORDER BY msg_time
+
+
+--change 
+DELETE FROM Chat WHERE msg_time = '2021-08-19 13:29:22.713'
+DELETE FROM Chat WHERE Sender = 1 AND Receiver = 2
+
+USE socialmedia
+GO
+
+--DISPLAY ALL POST (old)
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Users U ON P.Uid = U.Uid 
+WHERE U.Visible = 1
+
+--DISPLAY ALL POST FOR ONLY FRIEND (old)
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccept FA ON P.Uid = FA.Uid
+
+--DISPLAY POST BUT CATAGORIES VISE (old)
+SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Categories C ON 
+P.Category_ID = C.Category_ID where C.Category_Name = 'Art'
+
+
+--1.UN FRIEND NEEL AND JAY change
 DELETE FROM FriendRequest WHERE FriendRequest_Uid = (SELECT Uid FROM Users WHERE Name='Neel') AND
   FriendRequest_Frid = (SELECT uid FROM Users WHERE Name='Jay')
+
 
 --2.TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
@@ -394,22 +389,13 @@ SELECT Tags_Pid,COUNT(Tags_Pid) AS 'count tag per post' FROM Tags GROUP BY Tags_
 SELECT U.Name, SUM([COUNT_C]) FROM (SELECT Tags_Pid,COUNT(Tags_Pid) AS [COUNT_C] FROM Tags GROUP BY Tags_Pid)TAMP JOIN Post P 
 ON TAMP.TAGS_PID=P.Pid JOIN Users U ON P.Post_Uid = U.Uid GROUP BY U.Name
 
--- send friend request 
-INSERT INTO FriendRequest VALUES 
-	(1,5,0),
-	(2,6,0),
-	(5,4,0),
-	(1,2,0),
-	(3,4,0)
 
-GO
 SELECT * FROM [FriendRequest]
 
 -- Dispaly friend request by id
 SELECT a.Name,a.Uid FROM Users a JOIN FriendRequest b ON a.Uid = b.FriendRequest_Frid WHERE b.FriendRequest_Uid = 1  
 
--- Delete Request OR Reject Request
-DELETE FROM FriendRequest WHERE FriendRequest_Frid = 1  AND FriendRequest_Uid  = 1
+
 -- change 0 or 1
 --  Acceapte Request
 update [FriendRequest]
@@ -418,14 +404,6 @@ update [FriendRequest]
 
 
 SELECT * FROM FriendRequest
-
-
-
---Select convert(varchar(100),DecryptByPassPhrase('key',@Encrypt )) as Decrypt  
---Declare @Encrypt varbinary(200)  
---Select @Encrypt = EncryptByPassPhrase('key', 'Jothish' )  
---Select @Encrypt as Encrypt 
-
 
 SELECT * FROM Chat
 
@@ -465,7 +443,7 @@ SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
 	LEFT JOIN Post p ON p.Post_Uid = u.Uid
 	LEFT JOIN Categories c ON c.Category_ID = p.Post_Category_ID
 
--- List of friends
+-- List of friends count display
 SELECT COUNT(*) FROM 
 (SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus FROM FriendRequest f
 	LEFT JOIN Users u ON f.FriendRequest_Uid = u.Uid
@@ -495,7 +473,7 @@ GROUP BY Post_Uid
 SELECT Uid FROM Users 
 WHERE Uid NOT IN (SELECT FriendRequest_Uid FROM FriendRequest UNION SELECT FriendRequest_Frid FROM FriendRequest)
 
--- Users with total friends
+-- Users with total friends (check)
 SELECT FriendRequest_Uid as 'userID',COUNT(FriendRequest_Frid) FROM 
 (SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus as 'fs' FROM FriendRequest f) temp
 WHERE fs = 1
@@ -507,7 +485,7 @@ WHERE fs = 1
 GROUP BY FriendRequest_Frid
 
 
--- OR 
+-- OR  (check)
 SELECT FriendRequest_Uid as 'userID',COUNT(FriendRequest_Frid) FROM  FriendRequest
 WHERE friendstatus = 1
 GROUP BY FriendRequest_Uid
@@ -517,7 +495,7 @@ WHERE friendstatus = 1
 GROUP BY FriendRequest_Frid
 
 
--- friend suggestions 
+-- friend suggestions (check)
 SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT FriendRequest_Uid FROM 
 FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Frid  
 IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus  =1)) OR Uid 
@@ -638,16 +616,7 @@ SELECT * FROM Image WHERE Imageid IN
 (SELECT pid FROM post WHERE Post_Uid = (SELECT uid FROM users WHERE name = 'Vivek')))
 
 
-/* Comment table */
 
-
-INSERT INTO Comment
-Values
-('Nice Pic',1,2),
-('Beautifull',2,3),
-('Great Picture',2,4),
-('Good',5,3),
-('Nice Place',3,6)
 
 select * from Comment
 
@@ -691,8 +660,6 @@ WHERE u.Uid IN
 
 ----- Like ------
 
---TODAY'S Tranding post like vias
-SELECT Pid,Title,Likes,Post_Date FROM Post  WHERE Post_Date = CONVERT(DATE,GETDATE())  ORDER BY Likes DESC
 
 Select * FROM Likebyuser
 
@@ -745,6 +712,8 @@ a.Pid IN(SELECT LikebyUser_Pid FROM Likebyuser WHERE LikebyUser_Uid IN (SELECT U
 --
 --  acceapt request .
 UPDATE FriendRequest SET FriendStatus = 1, Approved_Date = GETDATE() WHERE FriendRequest_Uid = 1 AND FriendRequest_Frid = 5
+--  reject request .
+UPDATE FriendRequest SET FriendStatus = 0, Approved_Date = GETDATE() WHERE FriendRequest_Uid = 1 AND FriendRequest_Frid = 5
 
 -- request apporoved .
 SELECT FriendRequest_Frid  FROM FriendRequest WHERE FriendStatus = 1 AND FriendRequest_Uid = 1
@@ -872,8 +841,6 @@ WHERE rank = 1
 -- location
 SELECT * FROM dbo.Location
 
-
-
 -- added data for user status column
 ALTER TABLE Users
 ADD Status int CONSTRAINT chk_status FOREIGN KEY REFERENCES Master(Master_id)
@@ -972,3 +939,10 @@ ALTER TABLE Image
 ADD CONSTRAINT Ipid FOREIGN KEY (Imageid) REFERENCES POST(Pid) ON DELETE CASCADE ON UPDATE CASCADE
 
 
+--add columns in FriendRequest
+ ALTER TABLE FriendRequest ALTER COLUMN FriendStatus bit  not null 
+ ALTER TABLE FriendRequest ADD  Requested_Date DATE  not null DEFAULT GETDATE()
+ ALTER TABLE FriendRequest ADD  Approved_Date DATE  null
+
+ALTER TABLE Tags
+ADD CONSTRAINT UNIQUE_Tags UNIQUE(Tags_Pid,Tags_Uid)
