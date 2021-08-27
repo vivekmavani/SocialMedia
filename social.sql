@@ -106,6 +106,13 @@ Message NTEXT NOT NULL,
 Sendtime Datetime DEFAULT GETDATE()
 )
 
+CREATE TABLE GroupMessageSeen(
+	GroupMessageSeen_Groupid INT NOT NULL CONSTRAINT FKS_GroupMessageSeen_Groupid FOREIGN KEY REFERENCES dbo.GroupMessage(GrpMsg_id),
+	User_Uid INT NOT NULL CONSTRAINT FK_GroupMessageSeen_Uid FOREIGN KEY REFERENCES Users(Uid),
+	Read_Status INT  DEFAULT 8 CONSTRAINT fk_status_read FOREIGN KEY REFERENCES Master(Master_id),
+	CONSTRAINT Read_Status_check CHECK(Read_Status IN (8,9,10)),
+)
+
 --Tags Table
 CREATE TABLE Tags(
 	Tag_ID INT CONSTRAINT PK_Tag_ID PRIMARY KEY IDENTITY(1,1),
@@ -133,7 +140,21 @@ INSERT INTO Master VALUES
 ('Gender','Female'),
 ('Gender','Other'),
 ('Status','Online'),
-('Status','Offline')
+('Status','Offline'),
+ ('Message','Unread'),
+('Message','Read'),
+('Message','Send')
+
+-- insert into GroupMessageSeen
+INSERT INTO [dbo].[GroupMessageSeen]
+           ([GroupMessageSeen_Groupid]
+           ,[User_Uid]
+           ,[Read_Status])
+     VALUES
+           (1,1,8),
+		   (1,3,8),
+		   (1,4,8)
+GO
 
 --Insert data in Tags
 INSERT INTO Tags VALUES 
