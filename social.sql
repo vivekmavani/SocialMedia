@@ -259,34 +259,25 @@ INSERT INTO Chat VALUES
 
 
 --ADD POST BY FRIEND
-	INSERT INTO [dbo].[Post]
-           ([Title]
-           ,[Description]
-           ,[Image]
-           ,[Likes]
-           ,[Category_ID]
-           ,[Uid]
-           ,[Post_Date])
-     VALUES
-         
-		    ('photos','check this post','img_10.png',20,1,1,GETDATE()),
-	('like photo','check this post','img_101.png',10,2,3,GETDATE()),
-	('educational','post','img_101.png',20,7,4,GETDATE()),
-	('pubg','player','img_20.png',31,8,6,GETDATE()),
-	('dr.','operation','img_31.png',2,6,5,GETDATE()),
-	('new place','check out this post','img_100.png',30,1,4,GETDATE()),
-	('sport','fun news','img_110.png',24,2,5,GETDATE()),
-	('bajaj','loan work','img_50.png',2,4,5,GETDATE()),
-	('decoration','fastival decor','img_21.png',30,23,8,GETDATE())
+	INSERT INTO [dbo].[Post] VALUES
+    ('photos','check this post',20,1,1,GETDATE()),
+	('like photo','check this post',10,2,3,GETDATE()),
+	('educational','post',20,7,4,GETDATE()),
+	('pubg','player',31,8,6,GETDATE()),
+	('dr.','operation',2,6,5,GETDATE()),
+	('new place','check out this post',30,1,4,GETDATE()),
+	('sport','fun news',24,2,5,GETDATE()),
+	('bajaj','loan work',2,4,5,GETDATE()),
+	('decoration','fastival decor',30,23,8,GETDATE())
 GO
 
 -- send friend request 
 INSERT INTO FriendRequest VALUES 
-	(1,5,0),
-	(2,6,0),
-	(5,4,0),
-	(1,2,0),
-	(3,4,0)
+	(1,5,0,'2021-08-24'),
+	(2,6,0,'2021-08-24'),
+	(5,4,0,'2021-08-24'),
+	(1,2,0,'2020-08-10'),
+	(3,4,0,'2020-10-03')
 
 GO
 
@@ -323,7 +314,7 @@ Select Name,City,Email,PhoneNumber,convert(varchar(100),DecryptByPassPhrase('key
 -- Queries for Chat database
 
 
-DECLARE @Sender int
+DECLARE @Sender,@Re int
 SET @Sender = 1
 
 DECLARE @Receiver int
@@ -342,23 +333,26 @@ ORDER BY msg_time
 DELETE FROM Chat WHERE msg_time = '2021-08-19 13:29:22.713'
 DELETE FROM Chat WHERE Sender = 1 AND Receiver = 2
 
-USE socialmedia
-GO
-
---DISPLAY ALL POST (old)
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Users U ON P.Uid = U.Uid 
+--DISPLAY ALL POST 
+SELECT P.Pid,P.Description,P.Likes,P.Title FROM Post P JOIN Users U ON P.Post_Uid = U.Uid 
 WHERE U.Visible = 1
 
---DISPLAY ALL POST FOR ONLY FRIEND (old)
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN FriendAccept FA ON P.Uid = FA.Uid
+--DISPLAY ALL POST FOR ONLY FRIEND
+SELECT P.Pid,P.Description,P.Likes,P.Title FROM Post P JOIN FriendRequest FR ON P.Post_Uid = FR.FriendRequest_Uid
+WHERE Post_Uid IN 
+(SELECT Uid FROM  Users WHERE  Uid  IN 
+(Select DISTINCT FriendRequest_Uid FROM  FriendRequest WHERE FriendRequest_Frid = 1 AND FriendStatus = 1)
+OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
+FriendRequest WHERE FriendRequest_Uid  = 1 AND FriendStatus = 1))
 
---DISPLAY POST BUT CATAGORIES VISE (old)
-SELECT P.Pid,P.Description,P.Image,P.Likes,P.Title FROM Post P JOIN Categories C ON 
-P.Category_ID = C.Category_ID where C.Category_Name = 'Art'
+--DISPLAY POST BUT CATAGORIES VISE 
+SELECT P.Pid,P.Description,P.Likes,P.Title FROM Post P JOIN Categories C ON 
+P.Post_Category_ID = C.Category_ID where C.Category_Name = 'Album'
 
 
---1.UN FRIEND NEEL AND JAY change
-DELETE FROM FriendRequest WHERE FriendRequest_Uid = (SELECT Uid FROM Users WHERE Name='Neel') AND
+--1.UN FRIEND NEEL AND JAY 
+UPDATE FriendRequest 
+SET FriendStatus=0  WHERE FriendRequest_Uid = (SELECT Uid FROM Users WHERE Name='Neel') AND
   FriendRequest_Frid = (SELECT uid FROM Users WHERE Name='Jay')
 
 
