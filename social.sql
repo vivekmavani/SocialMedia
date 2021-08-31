@@ -3,6 +3,7 @@ CREATE DATABASE socialmedia1
 
 USE socialmedia1
 
+-- Location table
 Create Table Location(
 Locationid INT PRIMARY KEY IDENTITY(1,1),
 City VARCHAR(20) not null,
@@ -10,6 +11,9 @@ State VARCHAR(20) not null,
 Country VARCHAR(20) not null,
 )
 
+
+
+-- User table
 CREATE TABLE Users
 (
 Uid int  CONSTRAINT uid_User PRIMARY KEY  IDENTITY(1,1),
@@ -25,12 +29,18 @@ Password varbinary(200) not null,
 Gender not null nchar(1)  CONSTRAINT employees_Gender check(Gender IN('M','F','O')) 
 )
 
+
+
+-- Category Table
 CREATE TABLE Categories
 (
 Category_ID smallint constraint PK_Categories_Category_ID PRIMARY KEY IDENTITY(1,1),
 Category_Name varchar(20) not null
 )
 
+
+
+-- Post Table
 CREATE TABLE Post
 (
 Pid int  not null CONSTRAINT pid_Post PRIMARY KEY  IDENTITY(1,1),
@@ -42,6 +52,10 @@ Post_Uid int not null CONSTRAINT uid_Post FOREIGN KEY  REFERENCES  Users(Uid) ON
 Post_Date Date DEFAULT GETDATE()
 )
 
+
+
+
+-- FriendRequest Table
 CREATE TABLE FriendRequest
 (
 FriendRequestid int  CONSTRAINT FriendRequestid_Post PRIMARY KEY  IDENTITY(1,1),
@@ -52,7 +66,10 @@ FriendStatus bit not null,
 Requested_Date DATE  not null DEFAULT GETDATE(),
  Approved_Date DATE 
 )
--- add column read or unread add to the master table and set fk in this table
+
+
+
+-- Chat table
 CREATE TABLE Chat
 (
 Chat_id int PRIMARY KEY IDENTITY(1,1),
@@ -62,12 +79,20 @@ Msg ntext not null,
 Msg_Time datetime DEFAULT GETDATE()
 )
 
+
+
+
+-- Comment Table
 Create Table Comment(
 Comment_Id INT CONSTRAINT PK_Comment_Comment_Id PRIMARY KEY IDENTITY(1,1),
 Comment_Text NVARCHAR(100),
 Comment_Uid INT not null Constraint Ufk FOREIGN key REFERENCES USERS(Uid),
 Comment_Pid INT not null Constraint Pfk FOREIGN key REFERENCES Post(Pid)
 )
+
+
+
+
 -- add Likebyuser Table 
 CREATE TABLE Likebyuser
 (
@@ -75,6 +100,8 @@ Likeid int  not null CONSTRAINT Likeid_Likebyuser PRIMARY KEY  IDENTITY(1,1),
 LikebyUser_Pid int not null CONSTRAINT Pid_Likebyuser FOREIGN KEY  REFERENCES  Post(Pid) ON DELETE CASCADE ON UPDATE CASCADE,
 LikebyUser_Uid int not null CONSTRAINT Uid_Likebyusers FOREIGN KEY  REFERENCES  Users(Uid) 
 )
+
+
 
 -- group table
 CREATE TABLE Groups
@@ -86,6 +113,9 @@ Created_By int not null CONSTRAINT grp_lead FOREIGN KEY REFERENCES Users(Uid),
 CreatedAt datetime default GETDATE()
 )
 
+
+
+
 -- group members
 CREATE TABLE GroupMember
 (
@@ -96,7 +126,10 @@ Date_joined date DEFAULT GETDATE(),
 CONSTRAINT unqMember UNIQUE(Group_id,UserId)
 )
 
--- group message (add new table for who read the message)(GroupMessage_Groupid,GroupMember_Uid)
+
+
+
+-- group message 
 CREATE TABLE GroupMessage
 (
 GroupMessage_Groupid INT NOT NULL CONSTRAINT PK_GroupMessage_Groupid PRIMARY KEY IDENTITY(1,1),
@@ -106,12 +139,19 @@ Message NTEXT NOT NULL,
 Sendtime Datetime DEFAULT GETDATE()
 )
 
+
+
+
+-- GroupMessageSeen Table
 CREATE TABLE GroupMessageSeen(
 	GroupMessageSeen_Groupid INT NOT NULL CONSTRAINT FKS_GroupMessageSeen_Groupid FOREIGN KEY REFERENCES dbo.GroupMessage(GrpMsg_id),
 	User_Uid INT NOT NULL CONSTRAINT FK_GroupMessageSeen_Uid FOREIGN KEY REFERENCES Users(Uid),
 	Read_Status INT  DEFAULT 8 CONSTRAINT fk_status_read FOREIGN KEY REFERENCES Master(Master_id),
 	CONSTRAINT Read_Status_check CHECK(Read_Status IN (8,9,10)),
 )
+
+
+
 
 --Tags Table
 CREATE TABLE Tags(
@@ -123,6 +163,7 @@ CREATE TABLE Tags(
 
 
 
+
 -- Master table
 CREATE TABLE Master
 (
@@ -130,6 +171,36 @@ Master_id INT NOT NULL CONSTRAINT PK_Master_Master_id PRIMARY KEY IDENTITY(1,1),
 Master_Value VARCHAR(20) NOT NULL ,
 Master_SubValue VARCHAR(20) NOT NULL
 )
+
+
+
+
+/*Added Image Table in database*/
+Create table Image
+( Imageid int,
+  Image nvarchar(MAX) not null CONSTRAINT img CHECK(Image LIKE('%.png')) );
+
+  INSERT INTO Image
+  Values
+  (1,'img_01.png'),
+  (1,'img_02.png'),
+  (2,'img_03.png'),
+  (2,'img_04.png'),
+  (2,'img_05.png'),
+  (2,'img_06.png'),
+  (3,'img_07.png'),
+  (4,'img_08.png'),
+  (4,'img_09.png'),
+  (5,'img_11.png'),
+  (6,'img_12.png'),
+  (7,'img_13.png'),
+  (8,'img_14.png'),
+  (8,'img_15.png'),
+  (8,'img_16.png'),
+  (9,'img_17.png'),
+  (9,'img_18.png')
+
+
 
 
 -- Insert data in master
@@ -302,6 +373,42 @@ INSERT INTO FriendRequest VALUES
 
 GO
 
+
+
+
+INSERT INTO Groups VALUES
+('grp1','this is our college group',2,'2021-01-01'),
+('grp2','this is our School group',3,'2021-02-01'),
+('grp3','this is our office group',4,'2021-03-01'),
+('grp4','this is our Apartment group',5,'2021-04-04'),
+('grp5','this is our Friends group',2,'2021-08-05')
+
+
+INSERT INTO GroupMember VALUES
+(1,(SELECT uid FROM Users WHERE Uid = 1),'2021-01-02'),
+(1,(SELECT uid FROM Users WHERE Uid = 2),'2021-01-01'),
+(1,(SELECT uid FROM Users WHERE Uid = 3),'2021-01-02'),
+(1,(SELECT uid FROM Users WHERE Uid = 4),'2021-01-02'),
+(2,(SELECT uid FROM Users WHERE Uid = 3),'2021-02-01'),
+(2,(SELECT uid FROM Users WHERE Uid = 5),'2021-02-02'),
+(2,(SELECT uid FROM Users WHERE Uid = 6),'2021-02-02'),
+(5,(SELECT uid FROM Users WHERE Uid = 4),'2021-08-06'),
+(5,(SELECT uid FROM Users WHERE Uid = 5),'2021-08-06'),
+(5,(SELECT uid FROM Users WHERE Uid = 2),'2021-08-05')
+
+INSERT INTO GroupMessage([GroupMessage_Groupid],GroupMessage_Uid,Message) VALUES
+(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 2 ),'hello every one'),
+(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 3 ),'hi how are you'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 3 ),'hello'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 5 ),'good morning'),
+(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 6 ),'good evening'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 4 ),'happy journey'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'take care'),
+(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'Good night')
+
+
+
+
 /* Comment table */
 
 
@@ -335,7 +442,7 @@ Select Name,City,Email,PhoneNumber,convert(varchar(100),DecryptByPassPhrase('key
 -- Queries for Chat database
 
 
-DECLARE @Sender,@Re int
+DECLARE @Sender int
 SET @Sender = 1
 
 DECLARE @Receiver int
@@ -354,9 +461,11 @@ ORDER BY msg_time
 DELETE FROM Chat WHERE msg_time = '2021-08-19 13:29:22.713'
 DELETE FROM Chat WHERE Sender = 1 AND Receiver = 2
 
+
 --DISPLAY ALL POST 
 SELECT P.Pid,P.Description,P.Likes,P.Title FROM Post P JOIN Users U ON P.Post_Uid = U.Uid 
 WHERE U.Visible = 1
+
 
 --DISPLAY ALL POST FOR ONLY FRIEND
 SELECT P.Pid,P.Description,P.Likes,P.Title FROM Post P JOIN FriendRequest FR ON P.Post_Uid = FR.FriendRequest_Uid
@@ -365,6 +474,7 @@ WHERE Post_Uid IN
 (Select DISTINCT FriendRequest_Uid FROM  FriendRequest WHERE FriendRequest_Frid = 1 AND FriendStatus = 1)
 OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
 FriendRequest WHERE FriendRequest_Uid  = 1 AND FriendStatus = 1))
+
 
 --DISPLAY POST BUT CATAGORIES VISE 
 SELECT P.Pid,P.Description,P.Likes,P.Title FROM Post P JOIN Categories C ON 
@@ -380,8 +490,10 @@ SET FriendStatus=0  WHERE FriendRequest_Uid = (SELECT Uid FROM Users WHERE Name=
 --2.TODAY'S Tranding post like vias
 SELECT P.Pid,P.Title,P.Likes,P.Post_Date FROM Post P WHERE P.Post_Date = CONVERT(DATE,GETDATE())  ORDER BY P.Likes DESC
 
+
 --3.Display 18+ user name
 SELECT Name AS '18+ NAME',DATEDIFF(YY,dateofbirth,getdate()) as age FROM Users WHERE DATEDIFF(YY,dateofbirth,getdate())>18
+
 
 --4.Less than 18 to not show album , financial service,home improvement etc. like categories post
 
@@ -389,23 +501,25 @@ SELECT * FROM Post WHERE Post_Category_ID IN
 (SELECT Category_ID FROM Categories WHERE Category_Name NOT IN ('album','financial service','home improvement'))
 AND (SELECT DATEDIFF(YY,dateofbirth,GETDATE()) FROM Users WHERE Uid = 9)<18
 
+
 --5.Search post by name of user
-SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Users U ON U.Uid = P.Uid WHERE U.Name = 'Jay'
+SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Users U ON U.Uid = P.Post_Uid WHERE U.Name = 'Jay'
+
 
 --6.search post by categories name
 SELECT P.Pid,P.Title,P.Likes FROM Post P JOIN Categories C ON C.Category_ID = P.Post_Category_ID
 WHERE C.Category_Name = 'Album'
 
+
 --7.Count of Tags par post
 SELECT Tags_Pid,COUNT(Tags_Pid) AS 'count tag per post' FROM Tags GROUP BY Tags_Pid
+
 
 --8.which user how many tags added
 
 SELECT U.Name, SUM([COUNT_C]) FROM (SELECT Tags_Pid,COUNT(Tags_Pid) AS [COUNT_C] FROM Tags GROUP BY Tags_Pid)TAMP JOIN Post P 
 ON TAMP.TAGS_PID=P.Pid JOIN Users U ON P.Post_Uid = U.Uid GROUP BY U.Name
 
-
-SELECT * FROM [FriendRequest]
 
 -- Dispaly friend request by id
 SELECT a.Name,a.Uid FROM Users a JOIN FriendRequest b ON a.Uid = b.FriendRequest_Frid WHERE b.FriendRequest_Uid = 1  
@@ -418,20 +532,13 @@ update [FriendRequest]
   where FriendRequestid in (5,8)
 
 
-SELECT * FROM FriendRequest
-
-SELECT * FROM Chat
-
-SELECT * FROM Categories
-
-SELECT * FROM Users
-
 -- Display category name of user post
 
 SELECT c.Category_Name FROM Categories c
 	INNER JOIN Post p ON p.Post_Category_ID = c.Category_ID
 	INNER JOIN Users u ON u.Uid = p.Post_Uid
 WHERE u.Name = 'Vivek'
+
 
 -- Display mutual friends
 
@@ -452,11 +559,12 @@ SELECT fa.FriendRequest_Uid FROM FriendRequest fa
 WHERE fa.FriendRequest_Frid = 5)
 )
 
--- All users with its category name of Post
 
+-- All users with its category name of Post
 SELECT u.Name,p.Pid,p.Title,c.Category_ID,c.Category_Name FROM Users u
 	LEFT JOIN Post p ON p.Post_Uid = u.Uid
 	LEFT JOIN Categories c ON c.Category_ID = p.Post_Category_ID
+
 
 -- List of friends count display
 SELECT COUNT(*) FROM 
@@ -469,13 +577,13 @@ SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus FROM FriendReques
 WHERE u.Name = 'Prit') temp
 WHERE FriendStatus = 1
 
+
 -- List of users who have not posted anything
 SELECT Name,Uid FROM Users
 WHERE uid NOT IN (SELECT Post_uid FROM Post)
 
 
 -- Number of Post of all users
-
 SELECT COUNT(Pid) as 'no. of post',
 		Post_Uid,
 		(SELECT Name FROM Users WHERE Uid = Post.Post_Uid) as 'Name' 
@@ -484,11 +592,11 @@ GROUP BY Post_Uid
 
 
 -- List of users with 0 friends
-
 SELECT Uid FROM Users 
 WHERE Uid NOT IN (SELECT FriendRequest_Uid FROM FriendRequest UNION SELECT FriendRequest_Frid FROM FriendRequest)
 
--- Users with total friends (check)
+
+-- Users with total friends 
 SELECT FriendRequest_Uid as 'userID',COUNT(FriendRequest_Frid) FROM 
 (SELECT f.FriendRequest_Uid,f.FriendRequest_Frid,f.FriendStatus as 'fs' FROM FriendRequest f) temp
 WHERE fs = 1
@@ -500,7 +608,7 @@ WHERE fs = 1
 GROUP BY FriendRequest_Frid
 
 
--- OR  (check)
+-- OR  
 SELECT FriendRequest_Uid as 'userID',COUNT(FriendRequest_Frid) FROM  FriendRequest
 WHERE friendstatus = 1
 GROUP BY FriendRequest_Uid
@@ -510,7 +618,7 @@ WHERE friendstatus = 1
 GROUP BY FriendRequest_Frid
 
 
--- friend suggestions (check)
+-- friend suggestions 
 SELECT Name,Uid FROM  Users WHERE  Uid <>1  AND Uid  IN (Select DISTINCT FriendRequest_Uid FROM 
 FriendRequest WHERE  FriendStatus  =1 AND FriendRequest_Frid  
 IN(SELECT FriendRequest_Frid FROM FriendRequest WHERE FriendRequest_Uid  =1 AND FriendStatus  =1)) OR Uid 
@@ -632,22 +740,16 @@ SELECT * FROM Image WHERE Imageid IN
 
 
 
-
-select * from Comment
-
-
-
 --highest post in categories
 SELECT DENSE_RANK() OVER(ORDER BY COUNT(P.PID) DESC) as 'rank',C.Category_Name,COUNT(P.Pid) FROM Categories C  JOIN Post P ON C.Category_ID = P.Post_Category_ID
 GROUP BY Category_Name
+
 
 -- add dob in users
 ALTER TABLE Users ADD dateofbirth DATE
 
 
 -- Display username with max like on photo and users photo belongs to category name starts with A
-
-
 SELECT TOP 1 u.name as 'name',MAX(p.Likes) as 'max_like' FROM Users u
 	JOIN Post p ON p.Post_Uid = u.Uid
 	JOIN Categories c ON c.Category_ID = p.Post_Category_ID
@@ -657,16 +759,12 @@ ORDER BY max_like DESC
 
 
 -- List of users commented on Neel's post
-
 SELECT c.Comment_Uid,u.Name FROM Comment c
 	JOIN Users u ON u.Uid = c.Comment_Uid
 WHERE c.Comment_Pid IN (SELECT p.Pid FROM Post p WHERE p.Post_Uid = (SELECT Uid FROM Users WHERE Name = 'Neel'))
 
 
-
-
 -- Name of user on which Romish commented
-
 SELECT u.Name FROM Users u
 WHERE u.Uid IN 
 ( SELECT p.Post_Uid FROM Post p WHERE p.Pid IN 
@@ -693,14 +791,17 @@ DELETE Likebyuser WHERE LikebyUser_Pid = 4 AND LikebyUser_Uid = 1
 --display post like by user
 SELECT * FROM Post WHERE Pid IN(SELECT LikebyUser_Pid FROM Likebyuser WHERE LikebyUser_Uid = 1)
 
+
 -- who likes the post 
 SELECT a.Name,a.Uid FROM Users a JOIN Likebyuser b ON a.Uid = b.LikebyUser_Uid WHERE LikebyUser_Pid = 3
+
 
 -- display your post like by  your friends .
    SELECT a.Pid,a.Title,a.Description,c.Image,a.Likes,b.Category_Name,a.Post_Date,a.Post_Uid
    FROM Post a JOIN Categories b ON a.Post_Category_ID = b.Category_ID JOIN Image c ON c.Imageid = a.Pid
    WHERE b.Category_ID IN (SELECT a.Post_Category_ID FROM POST a JOIN
    Likebyuser b ON a.Pid = b.LikebyUser_Pid WHERE b.LikebyUser_Uid = 2) 
+
 
 -- friends of friends like . display recommended post like by your friend 
  with  friendss(Uid)
@@ -740,6 +841,7 @@ SELECT Name,Uid FROM  Users WHERE  Uid  IN
 OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
 FriendRequest WHERE FriendRequest_Uid  = 1 AND FriendStatus = 1)
 
+
 -- friends of friends .
   with  friends(Uid)
   AS
@@ -755,19 +857,25 @@ OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
 FriendRequest WHERE FriendRequest_Uid  IN (SELECT Uid FROM friends)
 AND FriendStatus = 1 AND FriendRequest_Frid <> 1)
 
+
 -- friend anniversary 
 SELECT DATEDIFF(YEAR,Approved_Date,GETDATE()) 'years of friend anniversary' FROM FriendRequest WHERE DATEDIFF(YEAR,Approved_Date,GETDATE()) >=1
+
+
 -- diffent of friend req. is approved
 SELECT DATEDIFF(DAY,Requested_Date,Approved_Date) FROM FriendRequest
+
+
 -- time of friend req. is approved
 SELECT DATEDIFF(DAY,Approved_Date,GETDATE()) FROM FriendRequest
 
 
 --Today's birthday 
 SELECT DATEDIFF(dd,Dateofbirth,GETDATE())/365 as age,  'Happy Birthday ' +
-Name as HappyBirthday  FROM Users WHERE 
+Name as HappyBirth	day  FROM Users WHERE 
 DATEPART(mm,GETDATE())-DATEPART(mm,Dateofbirth)=0 
 AND DATEPART(dd,GETDATE())-DATEPART(dd,Dateofbirth)=0
+
 
 -- Your Friend's Birthday (Today)
 SELECT DATEDIFF(dd,Dateofbirth,GETDATE())/365 as age, 
@@ -781,47 +889,19 @@ OR  Uid  IN (Select DISTINCT FriendRequest_Frid FROM
 FriendRequest WHERE FriendRequest_Uid  = 3 AND FriendStatus = 1))
 
 
-INSERT INTO Groups VALUES
-('grp1','this is our college group',2,'2021-01-01'),
-('grp2','this is our School group',3,'2021-02-01'),
-('grp3','this is our office group',4,'2021-03-01'),
-('grp4','this is our Apartment group',5,'2021-04-04'),
-('grp5','this is our Friends group',2,'2021-08-05')
-
-
-INSERT INTO GroupMember VALUES
-(1,(SELECT uid FROM Users WHERE Uid = 1),'2021-01-02'),
-(1,(SELECT uid FROM Users WHERE Uid = 2),'2021-01-01'),
-(1,(SELECT uid FROM Users WHERE Uid = 3),'2021-01-02'),
-(1,(SELECT uid FROM Users WHERE Uid = 4),'2021-01-02'),
-(2,(SELECT uid FROM Users WHERE Uid = 3),'2021-02-01'),
-(2,(SELECT uid FROM Users WHERE Uid = 5),'2021-02-02'),
-(2,(SELECT uid FROM Users WHERE Uid = 6),'2021-02-02'),
-(5,(SELECT uid FROM Users WHERE Uid = 4),'2021-08-06'),
-(5,(SELECT uid FROM Users WHERE Uid = 5),'2021-08-06'),
-(5,(SELECT uid FROM Users WHERE Uid = 2),'2021-08-05')
-
-INSERT INTO GroupMessage([GroupMessage_Groupid],GroupMessage_Uid,Message) VALUES
-(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 2 ),'hello every one'),
-(1,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 1 AND [GroupMember_Uid] = 3 ),'hi how are you'),
-(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 3 ),'hello'),
-(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 5 ),'good morning'),
-(2,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 2 AND [GroupMember_Uid] = 6 ),'good evening'),
-(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 4 ),'happy journey'),
-(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'take care'),
-(5,(SELECT [GroupMember_Uid] FROM GroupMember WHERE Group_id = 5 AND [GroupMember_Uid] = 5 ),'Good night')
-
-
 
 -- Queries for group chat
 
+
 -- Query to see names of all groups
 SELECT grp_name,GroupId FROM Groups 
+
 
 -- chat of group 1
 SELECT m.Message,u.Name FROM GroupMessage m
 	JOIN Users u ON u.Uid = m.GroupMessage_Uid
 WHERE m.grp_id = 1
+
 
 -- Members of groupid 5
 SELECT gm.GroupMember_Uid,u.Name FROM GroupMember gm
@@ -832,6 +912,7 @@ WHERE gm.Group_id = 5
 -- name of all members with group name 
 SELECT * FROM GroupMember gm
 	JOIN Users u ON u.Uid = gm.GroupMember_Uid
+
 
 -- display user name who is in more than 1 group
 SELECT u.Name FROM Users u
@@ -872,30 +953,6 @@ SET Status = 6 WHERE Uid IN (2,3,5,8)
 UPDATE Users
 SET Status = 7 WHERE Uid IN (4,6,7,9)
 
-/*Added Image Table in database*/
-Create table Image
-( Imageid int,
-  Image nvarchar(MAX) not null CONSTRAINT img CHECK(Image LIKE('%.png')) );
-
-  INSERT INTO Image
-  Values
-  (1,'img_01.png'),
-  (1,'img_02.png'),
-  (2,'img_03.png'),
-  (2,'img_04.png'),
-  (2,'img_05.png'),
-  (2,'img_06.png'),
-  (3,'img_07.png'),
-  (4,'img_08.png'),
-  (4,'img_09.png'),
-  (5,'img_11.png'),
-  (6,'img_12.png'),
-  (7,'img_13.png'),
-  (8,'img_14.png'),
-  (8,'img_15.png'),
-  (8,'img_16.png'),
-  (9,'img_17.png'),
-  (9,'img_18.png')
 
   /*Deleted image column from post and updated image table*/
 
